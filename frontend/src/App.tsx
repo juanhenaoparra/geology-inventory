@@ -1,11 +1,16 @@
-import './App.css'
+import React from 'react';
+import Header from './components/Header';
+import ToolRequestForm from './components/ToolsRequesForm';
+import ToolList from './components/ToolsList';
 
-function App() {
+const App: React.FC = () => {
     return (
-        <div className="App">
-            <h1>Primera página</h1>
+        <div className="min-h-screen bg-gray-100">
+            <Header />
+            <ToolRequestForm />
+            <ToolList /> {/* Solo llamamos a ToolList aquí */}
         </div>
-    )
-}
+    );
+};
 
-export default App
+export default App;
