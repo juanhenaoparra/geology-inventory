@@ -1,5 +1,5 @@
-from sqlmodel import SQLModel, Field
-from typing import Optional
+from sqlmodel import SQLModel, Field, Relationship
+from typing import Optional, List
 
 
 class Stock(SQLModel, table=True):
@@ -20,11 +20,7 @@ class User(SQLModel, table=True):
     subject: Optional[str]
     phone: Optional[str]
 
-
-class UserLoan(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int
-    loan_id: int
+    loans: List["UserLoan"] = Relationship(back_populates="user")
 
 
 class Loan(SQLModel, table=True):
@@ -34,9 +30,26 @@ class Loan(SQLModel, table=True):
     status: str
     observation: Optional[str]
 
+    users: List["UserLoan"] = Relationship(back_populates="loan")
+    stocks: List["LoanStock"] = Relationship(back_populates="loan")
 
-class LoanDetail(SQLModel, table=True):
+
+class UserLoan(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    loan_id: int
-    stock_id: int
+
+    user_id: Optional[int] = Field(default=None, foreign_key="user.id")
+    loan_id: Optional[int] = Field(default=None, foreign_key="loan.id")
+
+    user: Optional[User] = Relationship(back_populates="loans")
+    loan: Optional[Loan] = Relationship(back_populates="users")
+
+
+class LoanStock(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
     status: str
+
+    loan_id: Optional[int] = Field(foreign_key="loan.id")
+    stock_id: Optional[int] = Field(foreign_key="stock.id")
+
+    loan: Optional[Loan] = Relationship(back_populates="stocks")
+    stock: Optional[Stock] = Relationship(back_populates="loans")
