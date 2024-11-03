@@ -1,15 +1,11 @@
 import React from 'react';
-import Header from './components/Header';
-import ToolRequestForm from './components/ToolsRequesForm';
-import ToolList from './components/ToolsList';
+import StockItemForm from '@/components/StockItemForm';
 
 const App: React.FC = () => {
     return (
-        <div className="min-h-screen bg-gray-100">
-            <Header />
-            <ToolRequestForm />
-            <ToolList /> {/* Solo llamamos a ToolList aquí */}
-        </div>
+      <div className="container mx-auto p-4">
+        <StockItemForm />
+      </div>
     );
 };
 
