@@ -1,14 +1,35 @@
 import React from 'react';
-import Header from './components/Header';
-import ToolRequestForm from './components/ToolsRequesForm';
-import ToolList from './components/ToolsList';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import StockItemForm from '@/components/StockItemForm';
 
 const App: React.FC = () => {
     return (
-        <div className="min-h-screen bg-gray-100">
-            <Header />
-            <ToolRequestForm />
-            <ToolList /> {/* Solo llamamos a ToolList aquí */}
+        <BrowserRouter>
+            <div className="container mx-auto p-4">
+                {/* Navigation */}
+                <nav className="mb-4">
+                    <ul className="flex gap-4">
+                        <li><Link to="/" className="hover:underline">Home</Link></li>
+                        <li><Link to="/stock" className="hover:underline">Stock Form</Link></li>
+                    </ul>
+                </nav>
+
+                {/* Routes */}
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/stock" element={<StockItemForm />} />
+                </Routes>
+            </div>
+        </BrowserRouter>
+    );
+};
+
+// Simple Home component
+const Home: React.FC = () => {
+    return (
+        <div>
+            <h1 className="text-2xl font-bold">Welcome to Geology Inventory</h1>
+            <p className="mt-2">Select an option from the navigation above.</p>
         </div>
     );
 };
