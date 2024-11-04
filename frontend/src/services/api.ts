@@ -3,8 +3,8 @@ const API_HOST = import.meta.env.VITE_API_HOST;
 export const submitStockItem = async (formData: {
   name: string;
   description: string;
-  inventoryCode: string;
-  quantity: string;
+  inventory_code: string;
+  quality: string;
 }) => {
   const response = await fetch(`${API_HOST}/stock`, {
     method: 'POST',
