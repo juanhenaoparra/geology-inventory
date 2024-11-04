@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { submitStockItem } from '@/services/api'
 
 export default function StockItemForm() {
   const [formData, setFormData] = useState({
@@ -17,11 +18,11 @@ export default function StockItemForm() {
     quantity: ''
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
@@ -40,18 +41,27 @@ export default function StockItemForm() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (validateForm()) {
-      // Here you would typically send the data to your backend
-      console.log('Form submitted:', formData)
-      // Reset form after successful submission
-      setFormData({ name: '', description: '', inventoryCode: '', quantity: '' })
+      try {
+        await submitStockItem(formData);
+        setFormData({ name: '', description: '', inventoryCode: '', quantity: '' });
+        setNotification({ message: 'Stock item added successfully!', type: 'success' });
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        setNotification({ message: 'Error submitting form. Please try again.', type: 'error' });
+      }
     }
-  }
+  };
 
   return (
     <Card className="w-full max-w-md mx-auto">
+      {notification && (
+        <div className={`p-4 mb-4 text-sm ${notification.type === 'success' ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'} rounded-lg`} role="alert">
+          {notification.message}
+        </div>
+      )}
       <CardHeader>
         <CardTitle>Add Stock Item</CardTitle>
         <CardDescription>Enter the details of the new stock item.</CardDescription>
