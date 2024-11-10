@@ -2,14 +2,12 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 from sqlmodel import Session
-from typing import List
 
 from database import get_session
 from models.models import Stock
 from controllers.stock import store_stock
 from controllers.exceptions import UserError
 from controllers.loan import tool_loan_history
-from models.models import Loan
 
 router = APIRouter()
 
