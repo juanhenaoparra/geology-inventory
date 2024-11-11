@@ -1,54 +1,43 @@
 import { LoanHistory } from '@/models/business/loan.model'
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { getLoans } from '@/services/api'
 
 const LoansList: React.FC = () => {
     const [loans, setLoans] = useState<LoanHistory[]>([])
-    const [rowsLimit] = useState(6)
-    const [rowsToShow, setRowsToShow] = useState(loans.slice(0, rowsLimit))
-    const [customPagination, setCustomPagination] = useState<number[]>([])
-    const [totalPage, setTotalPage] = useState(Math.ceil(loans?.length / rowsLimit))
-    const [currentPage, setCurrentPage] = useState(0)
+    const [currentPage, setCurrentPage] = useState(1)
+    const [pageSize] = useState(10)
+    const [totalItems, setTotalItems] = useState(0)
+    const [totalPages, setTotalPages] = useState(0)
+    const [hasNext, setHasNext] = useState(false)
+    const [hasPrev, setHasPrev] = useState(false)
+
+    useEffect(() => {
+        getLoans(currentPage, pageSize).then((data) => {
+            console.log(data)
+            setLoans(data.items)
+            setTotalItems(data.total)
+            setTotalPages(data.pages)
+            setHasNext(data.has_next)
+            setHasPrev(data.has_prev)
+        })
+    }, [currentPage, pageSize])
 
     const nextPage = () => {
-        const startIndex = rowsLimit * (currentPage + 1)
-        const endIndex = startIndex + rowsLimit
-        const newArray = loans.slice(startIndex, endIndex)
-        setRowsToShow(newArray)
-        setCurrentPage(currentPage + 1)
-    }
-
-    const changePage = (value: number) => {
-        const startIndex = value * rowsLimit
-        const endIndex = startIndex + rowsLimit
-        const newArray = loans.slice(startIndex, endIndex)
-        setRowsToShow(newArray)
-        setCurrentPage(value)
-    }
-
-    const previousPage = () => {
-        const startIndex = (currentPage - 1) * rowsLimit
-        const endIndex = startIndex + rowsLimit
-        const newArray = loans.slice(startIndex, endIndex)
-        setRowsToShow(newArray)
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1)
-        } else {
-            setCurrentPage(0)
+        if (hasNext) {
+            setCurrentPage((prev) => prev + 1)
         }
     }
 
-    useEffect(() => {
-        getLoans().then((data) => {
-            setLoans(data)
-            setTotalPage(Math.ceil(data?.length / rowsLimit))
-            setRowsToShow(data.slice(0, rowsLimit))
-        })
-    }, [])
+    const previousPage = () => {
+        if (hasPrev) {
+            setCurrentPage((prev) => prev - 1)
+        }
+    }
 
-    useMemo(() => {
-        setCustomPagination(Array(Math.ceil(loans?.length / rowsLimit)).fill(null))
-    }, [loans])
+    const changePage = (page: number) => {
+        setCurrentPage(page)
+    }
+
     return (
         <div className="h-full bg-white flex items-center justify-center pt-10 pb-14">
             <div className="w-full px-2">
@@ -85,7 +74,7 @@ const LoansList: React.FC = () => {
 
                         {/* Table body */}
                         <tbody>
-                            {rowsToShow?.map((data, index) => (
+                            {loans?.map((data, index) => (
                                 <tr
                                     className={`${
                                         index % 2 == 0 ? 'bg-white' : 'bg-[#222E3A]/[6%]'
@@ -96,7 +85,7 @@ const LoansList: React.FC = () => {
                                         className={`py-2 px-3 font-normal text-base ${
                                             index == 0
                                                 ? 'border-t-2 border-black'
-                                                : index == rowsToShow?.length
+                                                : index == loans?.length
                                                 ? 'border-y'
                                                 : 'border-t'
                                         } whitespace-nowrap`}
@@ -107,7 +96,7 @@ const LoansList: React.FC = () => {
                                         className={`py-2 px-3 font-normal text-base ${
                                             index == 0
                                                 ? 'border-t-2 border-black'
-                                                : index == rowsToShow?.length
+                                                : index == loans?.length
                                                 ? 'border-y'
                                                 : 'border-t'
                                         } whitespace-nowrap`}
@@ -118,7 +107,7 @@ const LoansList: React.FC = () => {
                                         className={`py-2 px-3 font-normal text-base ${
                                             index == 0
                                                 ? 'border-t-2 border-black'
-                                                : index == rowsToShow?.length
+                                                : index == loans?.length
                                                 ? 'border-y'
                                                 : 'border-t'
                                         } whitespace-nowrap`}
@@ -129,7 +118,7 @@ const LoansList: React.FC = () => {
                                         className={`py-2 px-3 text-base  font-normal ${
                                             index == 0
                                                 ? 'border-t-2 border-black'
-                                                : index == rowsToShow?.length
+                                                : index == loans?.length
                                                 ? 'border-y'
                                                 : 'border-t'
                                         } whitespace-nowrap`}
@@ -140,7 +129,7 @@ const LoansList: React.FC = () => {
                                         className={`py-2 px-3 text-base  font-normal ${
                                             index == 0
                                                 ? 'border-t-2 border-black'
-                                                : index == rowsToShow?.length
+                                                : index == loans?.length
                                                 ? 'border-y'
                                                 : 'border-t'
                                         } min-w-[250px]`}
@@ -151,7 +140,7 @@ const LoansList: React.FC = () => {
                                         className={`py-5 px-4 text-base  font-normal ${
                                             index == 0
                                                 ? 'border-t-2 border-black'
-                                                : index == rowsToShow?.length
+                                                : index == loans?.length
                                                 ? 'border-y'
                                                 : 'border-t'
                                         }`}
@@ -167,53 +156,57 @@ const LoansList: React.FC = () => {
                 {/* Pagination */}
                 <div className="w-full  flex justify-center sm:justify-between flex-col sm:flex-row gap-5 mt-1.5 px-1 items-center">
                     <div className="text-lg">
-                        Showing {currentPage == 0 ? 1 : currentPage * rowsLimit + 1} to{' '}
-                        {currentPage == totalPage - 1
-                            ? loans?.length
-                            : (currentPage + 1) * rowsLimit}{' '}
-                        of {loans?.length} entries
+                        Mostrando {(currentPage - 1) * pageSize + 1} a{' '}
+                        {Math.min(currentPage * pageSize, totalItems)} de {totalItems} entradas
                     </div>
                     <div className="flex">
-                        <ul
-                            className="flex justify-center items-center gap-x-[10px] z-30"
-                            role="navigation"
-                            aria-label="Pagination"
-                        >
-                            <li
-                                className={` prev-btn flex items-center justify-center w-[36px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] disabled] ${
-                                    currentPage == 0
-                                        ? 'bg-[#cccccc] pointer-events-none'
-                                        : ' cursor-pointer'
-                                }
-  `}
-                                onClick={previousPage}
-                            >
-                                <img src="https://www.tailwindtap.com/assets/travelagency-admin/leftarrow.svg" />
-                            </li>
-                            {customPagination?.map((data, index) => (
-                                <li
-                                    className={`flex items-center justify-center w-[36px] rounded-[6px] h-[34px] border-[1px] border-solid border-[2px] bg-[#FFFFFF] cursor-pointer ${
-                                        currentPage == index
-                                            ? 'text-blue-600  border-sky-500'
-                                            : 'border-[#E4E4EB] '
-                                    }`}
-                                    onClick={() => changePage(index)}
-                                    key={index}
-                                >
-                                    {index + 1}
+                        <nav>
+                            <ul className="flex justify-center items-center gap-x-[10px] z-30">
+                                <li>
+                                    <button
+                                        className={`prev-btn flex items-center justify-center w-[36px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] disabled] ${
+                                            !hasPrev
+                                                ? 'bg-[#cccccc] pointer-events-none'
+                                                : ' cursor-pointer'
+                                        }`}
+                                        onClick={previousPage}
+                                        disabled={!hasPrev}
+                                    >
+                                        <img
+                                            src="https://www.tailwindtap.com/assets/travelagency-admin/leftarrow.svg"
+                                            alt="Previous page"
+                                        />
+                                    </button>
                                 </li>
-                            ))}
-                            <li
-                                className={`flex items-center justify-center w-[36px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] ${
-                                    currentPage == totalPage - 1
-                                        ? 'bg-[#cccccc] pointer-events-none'
-                                        : ' cursor-pointer'
-                                }`}
-                                onClick={nextPage}
-                            >
-                                <img src="https://www.tailwindtap.com/assets/travelagency-admin/rightarrow.svg" />
-                            </li>
-                        </ul>
+                                {Array.from({ length: totalPages }, (_, index) => (
+                                    <li key={index}>
+                                        <button
+                                            onClick={() => changePage(index + 1)}
+                                            className={`flex items-center justify-center w-[36px] rounded-[6px] h-[34px] border-[1px] border-solid border-[2px] bg-[#FFFFFF] cursor-pointer ${
+                                                currentPage == index
+                                                    ? 'text-blue-600  border-sky-500'
+                                                    : 'border-[#E4E4EB] '
+                                            }`}
+                                        >
+                                            {index + 1}
+                                        </button>
+                                    </li>
+                                ))}
+                                <li>
+                                    <button
+                                        className={`flex items-center justify-center w-[36px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] ${
+                                            !hasNext
+                                                ? 'bg-[#cccccc] pointer-events-none'
+                                                : ' cursor-pointer'
+                                        }`}
+                                        onClick={nextPage}
+                                        disabled={!hasNext}
+                                    >
+                                        <img src="https://www.tailwindtap.com/assets/travelagency-admin/rightarrow.svg" />
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
             </div>
