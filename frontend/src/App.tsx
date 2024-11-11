@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import StockItemForm from '@/components/StockItemForm';
+import StockItemForm from '@/components/pages/StockItemForm';
+import StockList from '@/components/pages/StockList';
+import EditStockItemFormWrapper from './components/pages/EditStockFormWrapper';
 
 const App: React.FC = () => {
     return (
@@ -11,6 +13,7 @@ const App: React.FC = () => {
                     <ul className="flex gap-4">
                         <li><Link to="/" className="hover:underline">Home</Link></li>
                         <li><Link to="/stock" className="hover:underline">Stock Form</Link></li>
+                        <li><Link to="/stockList" className="hover:underline">Stock List</Link></li>
                     </ul>
                 </nav>
 
@@ -18,6 +21,8 @@ const App: React.FC = () => {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/stock" element={<StockItemForm />} />
+                    <Route path="/stockList" element={<StockList />} />
+                    <Route path="/edit-stock/:itemId" element={<EditStockItemFormWrapper />} />
                 </Routes>
             </div>
         </BrowserRouter>
