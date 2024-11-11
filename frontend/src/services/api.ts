@@ -20,3 +20,9 @@ export const submitStockItem = async (formData: {
 
   return await response.json();
 };
+
+export const getLoans = async () => {
+  const response = await fetch(`${API_HOST}/loans`);
+  return await response.json();
+};
+
