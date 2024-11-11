@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
+from fastapi import Query
 from sqlmodel import Session
 
 from database import get_session
@@ -32,9 +33,13 @@ def get_tool_loan_history(tool_id: int, session: Session = Depends(get_session))
     return tool_loan_history(session=session, tool_id=tool_id)
 
 @router.get("/loans")
-def get_loans(session: Session = Depends(get_session)):
-    """Get all loans"""
-    return loans(session=session)
+def get_loans(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+    session: Session = Depends(get_session)
+):
+    """Obtener todos los préstamos"""
+    return loans(session=session, page=page, page_size=page_size)
 
 @router.post("/stock")
 def post_store_stock(stock: Stock, session: Session = Depends(get_session)):
