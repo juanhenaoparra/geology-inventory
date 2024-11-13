@@ -34,6 +34,12 @@ const LoansList: React.FC = () => {
         }))
     }
 
+    const getBorderClass = (index: number, loansLength: number) => {
+        if (index === 0) return 'border-t-2 border-black'
+        if (index === loansLength) return 'border-y'
+        return 'border-t'
+    }
+
     return (
         <div className="h-full bg-white flex items-center justify-center pt-10 pb-14">
             <div className="w-full px-2">
@@ -75,71 +81,53 @@ const LoansList: React.FC = () => {
                                     className={`${
                                         index % 2 == 0 ? 'bg-white' : 'bg-[#222E3A]/[6%]'
                                     }`}
-                                    key={index}
+                                    key={data.id}
                                 >
                                     <td
-                                        className={`py-2 px-3 font-normal text-base ${
-                                            index == 0
-                                                ? 'border-t-2 border-black'
-                                                : index == loans?.length
-                                                ? 'border-y'
-                                                : 'border-t'
-                                        } whitespace-nowrap`}
+                                        className={`py-2 px-3 font-normal text-base ${getBorderClass(
+                                            index,
+                                            loans.length,
+                                        )} whitespace-nowrap`}
                                     >
                                         {data?.id}
                                     </td>
                                     <td
-                                        className={`py-2 px-3 font-normal text-base ${
-                                            index == 0
-                                                ? 'border-t-2 border-black'
-                                                : index == loans?.length
-                                                ? 'border-y'
-                                                : 'border-t'
-                                        } whitespace-nowrap`}
+                                        className={`py-2 px-3 font-normal text-base ${getBorderClass(
+                                            index,
+                                            loans.length,
+                                        )} whitespace-nowrap`}
                                     >
                                         {data?.user_name}
                                     </td>
                                     <td
-                                        className={`py-2 px-3 font-normal text-base ${
-                                            index == 0
-                                                ? 'border-t-2 border-black'
-                                                : index == loans?.length
-                                                ? 'border-y'
-                                                : 'border-t'
-                                        } whitespace-nowrap`}
+                                        className={`py-2 px-3 font-normal text-base ${getBorderClass(
+                                            index,
+                                            loans.length,
+                                        )} whitespace-nowrap`}
                                     >
                                         {data?.loan_date}
                                     </td>
                                     <td
-                                        className={`py-2 px-3 text-base  font-normal ${
-                                            index == 0
-                                                ? 'border-t-2 border-black'
-                                                : index == loans?.length
-                                                ? 'border-y'
-                                                : 'border-t'
-                                        } whitespace-nowrap`}
+                                        className={`py-2 px-3 text-base  font-normal ${getBorderClass(
+                                            index,
+                                            loans.length,
+                                        )} whitespace-nowrap`}
                                     >
                                         {data?.return_date}
                                     </td>
                                     <td
-                                        className={`py-2 px-3 text-base  font-normal ${
-                                            index == 0
-                                                ? 'border-t-2 border-black'
-                                                : index == loans?.length
-                                                ? 'border-y'
-                                                : 'border-t'
-                                        } min-w-[250px]`}
+                                        className={`py-2 px-3 text-base  font-normal ${getBorderClass(
+                                            index,
+                                            loans.length,
+                                        )} min-w-[250px]`}
                                     >
                                         {data?.observation}
                                     </td>
                                     <td
-                                        className={`py-5 px-4 text-base  font-normal ${
-                                            index == 0
-                                                ? 'border-t-2 border-black'
-                                                : index == loans?.length
-                                                ? 'border-y'
-                                                : 'border-t'
-                                        }`}
+                                        className={`py-5 px-4 text-base  font-normal ${getBorderClass(
+                                            index,
+                                            loans.length,
+                                        )}`}
                                     >
                                         {data?.status}
                                     </td>
