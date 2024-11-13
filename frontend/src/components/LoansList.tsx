@@ -5,38 +5,33 @@ import { getLoans } from '@/services/api'
 
 const LoansList: React.FC = () => {
     const [loans, setLoans] = useState<LoanHistory[]>([])
-    const [currentPage, setCurrentPage] = useState(1)
-    const [pageSize] = useState(10)
-    const [totalItems, setTotalItems] = useState(0)
-    const [totalPages, setTotalPages] = useState(0)
-    const [hasNext, setHasNext] = useState(false)
-    const [hasPrev, setHasPrev] = useState(false)
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        pageSize: 10,
+        totalItems: 0,
+        totalPages: 0,
+        hasNext: false,
+        hasPrev: false,
+    })
 
     useEffect(() => {
-        getLoans(currentPage, pageSize).then((data) => {
-            console.log(data)
+        getLoans(pagination.currentPage, pagination.pageSize).then((data) => {
             setLoans(data.items)
-            setTotalItems(data.total)
-            setTotalPages(data.pages)
-            setHasNext(data.has_next)
-            setHasPrev(data.has_prev)
+            setPagination((prev) => ({
+                ...prev,
+                totalItems: data.total,
+                totalPages: data.pages,
+                hasNext: data.has_next,
+                hasPrev: data.has_prev,
+            }))
         })
-    }, [currentPage, pageSize])
+    }, [pagination.currentPage, pagination.pageSize])
 
-    const nextPage = () => {
-        if (hasNext) {
-            setCurrentPage((prev) => prev + 1)
-        }
-    }
-
-    const previousPage = () => {
-        if (hasPrev) {
-            setCurrentPage((prev) => prev - 1)
-        }
-    }
-
-    const changePage = (page: number) => {
-        setCurrentPage(page)
+    const handlePaginationChange = (newPage: number) => {
+        setPagination((prev) => ({
+            ...prev,
+            currentPage: newPage,
+        }))
     }
 
     return (
@@ -154,17 +149,7 @@ const LoansList: React.FC = () => {
                     </table>
                 </div>
 
-                <Pagination
-                    currentPage={currentPage}
-                    pageSize={pageSize}
-                    totalItems={totalItems}
-                    totalPages={totalPages}
-                    hasNext={hasNext}
-                    hasPrev={hasPrev}
-                    onPageChange={changePage}
-                    onNextPage={nextPage}
-                    onPrevPage={previousPage}
-                />
+                <Pagination pagination={pagination} onPaginationChange={handlePaginationChange} />
             </div>
         </div>
     )

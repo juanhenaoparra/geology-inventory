@@ -1,28 +1,34 @@
 import React from 'react'
 
-interface PaginationProps {
+interface PaginationState {
     currentPage: number
     pageSize: number
     totalItems: number
     totalPages: number
     hasNext: boolean
     hasPrev: boolean
-    onPageChange: (page: number) => void
-    onNextPage: () => void
-    onPrevPage: () => void
 }
 
-const Pagination: React.FC<PaginationProps> = ({
-    currentPage,
-    pageSize,
-    totalItems,
-    totalPages,
-    hasNext,
-    hasPrev,
-    onPageChange,
-    onNextPage,
-    onPrevPage
-}) => {
+interface PaginationProps {
+    pagination: PaginationState
+    onPaginationChange: (newPage: number) => void
+}
+
+const Pagination: React.FC<PaginationProps> = ({ pagination, onPaginationChange }) => {
+    const { currentPage, pageSize, totalItems, totalPages, hasNext, hasPrev } = pagination
+
+    const handleNextPage = () => {
+        if (hasNext) {
+            onPaginationChange(currentPage + 1)
+        }
+    }
+
+    const handlePrevPage = () => {
+        if (hasPrev) {
+            onPaginationChange(currentPage - 1)
+        }
+    }
+
     return (
         <div className="w-full flex justify-center sm:justify-between flex-col sm:flex-row gap-5 mt-1.5 px-1 items-center">
             <div className="text-lg">
@@ -39,7 +45,7 @@ const Pagination: React.FC<PaginationProps> = ({
                                         ? 'bg-[#cccccc] pointer-events-none'
                                         : ' cursor-pointer'
                                 }`}
-                                onClick={onPrevPage}
+                                onClick={handlePrevPage}
                                 disabled={!hasPrev}
                             >
                                 <img
@@ -51,7 +57,7 @@ const Pagination: React.FC<PaginationProps> = ({
                         {Array.from({ length: totalPages }, (_, index) => (
                             <li key={index}>
                                 <button
-                                    onClick={() => onPageChange(index + 1)}
+                                    onClick={() => onPaginationChange(index + 1)}
                                     className={`flex items-center justify-center w-[36px] rounded-[6px] h-[34px] border-[1px] border-solid border-[2px] bg-[#FFFFFF] cursor-pointer ${
                                         currentPage === index + 1
                                             ? 'text-blue-600 border-sky-500'
@@ -69,12 +75,12 @@ const Pagination: React.FC<PaginationProps> = ({
                                         ? 'bg-[#cccccc] pointer-events-none'
                                         : ' cursor-pointer'
                                 }`}
-                                onClick={onNextPage}
+                                onClick={handleNextPage}
                                 disabled={!hasNext}
                             >
-                                <img 
+                                <img
                                     src="https://www.tailwindtap.com/assets/travelagency-admin/rightarrow.svg"
-                                    alt="Siguiente página" 
+                                    alt="Siguiente página"
                                 />
                             </button>
                         </li>
@@ -85,4 +91,4 @@ const Pagination: React.FC<PaginationProps> = ({
     )
 }
 
-export default Pagination 
+export default Pagination
