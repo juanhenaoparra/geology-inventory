@@ -1,7 +1,15 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
-import StockItemForm from '@/components/StockItemForm'
+
+import React from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import StockItemForm from '@/components/pages/StockItemForm';
+import StockList from '@/components/pages/StockList';
 import LoansList from '@/components/LoansList'
 import React from 'react'
+import EditStockItemFormWrapper from './components/pages/EditStockFormWrapper';
+
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import StockItemForm from '@/components/StockItemForm'
+
 
 const App: React.FC = () => {
     return (
@@ -10,17 +18,11 @@ const App: React.FC = () => {
                 {/* Navigation */}
                 <nav className="mb-4">
                     <ul className="flex gap-4">
-                        <li>
-                            <Link to="/" className="hover:underline">
-                                Home
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/stock" className="hover:underline">
-                                Stock Form
-                            </Link>
-                        </li>
-                        <li>
+
+                        <li><Link to="/" className="hover:underline">Home</Link></li>
+                        <li><Link to="/stock" className="hover:underline">Stock Form</Link></li>
+                        <li><Link to="/stockList" className="hover:underline">Stock List</Link></li>
+        <li>
                             <Link to="/loans" className="hover:underline">
                                 Préstamos
                             </Link>
@@ -32,7 +34,12 @@ const App: React.FC = () => {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/stock" element={<StockItemForm />} />
+
+                    <Route path="/stockList" element={<StockList />} />
+                    <Route path="/edit-stock/:itemId" element={<EditStockItemFormWrapper />} />
+
                     <Route path="/loans" element={<LoansList />} />
+
                 </Routes>
             </div>
         </BrowserRouter>
