@@ -1,4 +1,5 @@
 import { LoanHistory } from '@/models/business/loan.model'
+import Pagination from '@/components/ui/Pagination'
 import { useState, useEffect } from 'react'
 import { getLoans } from '@/services/api'
 
@@ -153,62 +154,17 @@ const LoansList: React.FC = () => {
                     </table>
                 </div>
 
-                {/* Pagination */}
-                <div className="w-full  flex justify-center sm:justify-between flex-col sm:flex-row gap-5 mt-1.5 px-1 items-center">
-                    <div className="text-lg">
-                        Mostrando {(currentPage - 1) * pageSize + 1} a{' '}
-                        {Math.min(currentPage * pageSize, totalItems)} de {totalItems} entradas
-                    </div>
-                    <div className="flex">
-                        <nav>
-                            <ul className="flex justify-center items-center gap-x-[10px] z-30">
-                                <li>
-                                    <button
-                                        className={`prev-btn flex items-center justify-center w-[36px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] disabled] ${
-                                            !hasPrev
-                                                ? 'bg-[#cccccc] pointer-events-none'
-                                                : ' cursor-pointer'
-                                        }`}
-                                        onClick={previousPage}
-                                        disabled={!hasPrev}
-                                    >
-                                        <img
-                                            src="https://www.tailwindtap.com/assets/travelagency-admin/leftarrow.svg"
-                                            alt="Previous page"
-                                        />
-                                    </button>
-                                </li>
-                                {Array.from({ length: totalPages }, (_, index) => (
-                                    <li key={index}>
-                                        <button
-                                            onClick={() => changePage(index + 1)}
-                                            className={`flex items-center justify-center w-[36px] rounded-[6px] h-[34px] border-[1px] border-solid border-[2px] bg-[#FFFFFF] cursor-pointer ${
-                                                currentPage == index
-                                                    ? 'text-blue-600  border-sky-500'
-                                                    : 'border-[#E4E4EB] '
-                                            }`}
-                                        >
-                                            {index + 1}
-                                        </button>
-                                    </li>
-                                ))}
-                                <li>
-                                    <button
-                                        className={`flex items-center justify-center w-[36px] rounded-[6px] h-[36px] border-[1px] border-solid border-[#E4E4EB] ${
-                                            !hasNext
-                                                ? 'bg-[#cccccc] pointer-events-none'
-                                                : ' cursor-pointer'
-                                        }`}
-                                        onClick={nextPage}
-                                        disabled={!hasNext}
-                                    >
-                                        <img src="https://www.tailwindtap.com/assets/travelagency-admin/rightarrow.svg" />
-                                    </button>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
+                <Pagination
+                    currentPage={currentPage}
+                    pageSize={pageSize}
+                    totalItems={totalItems}
+                    totalPages={totalPages}
+                    hasNext={hasNext}
+                    hasPrev={hasPrev}
+                    onPageChange={changePage}
+                    onNextPage={nextPage}
+                    onPrevPage={previousPage}
+                />
             </div>
         </div>
     )
