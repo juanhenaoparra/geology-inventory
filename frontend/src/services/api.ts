@@ -1,4 +1,5 @@
 const API_HOST = import.meta.env.VITE_API_HOST;
+import { LoanHistory } from "@models/business/loan.model";
 
 export const submitStockItem = async (formData: {
   name: string;
@@ -74,3 +75,19 @@ export async function updateStockItem(id: number, updatedData: Partial<StockItem
     return null;
   }
 }
+
+interface PaginatedResponse<T> {
+    items: T[];
+    total: number;
+    page: number;
+    page_size: number;
+    pages: number;
+    has_next: boolean;
+    has_prev: boolean;
+}
+
+export const getLoans = async (page: number = 1, pageSize: number = 10): Promise<PaginatedResponse<LoanHistory>> => {
+    const response = await fetch(`${API_HOST}/loans?page=${page}&page_size=${pageSize}`);
+    return await response.json();
+};
+
