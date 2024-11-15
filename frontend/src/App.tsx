@@ -4,11 +4,7 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import StockItemForm from '@/components/pages/StockItemForm';
 import StockList from '@/components/pages/StockList';
 import LoansList from '@/components/LoansList'
-import React from 'react'
 import EditStockItemFormWrapper from './components/pages/EditStockFormWrapper';
-
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
-import StockItemForm from '@/components/StockItemForm'
 
 
 const App: React.FC = () => {
@@ -22,7 +18,7 @@ const App: React.FC = () => {
                         <li><Link to="/" className="hover:underline">Home</Link></li>
                         <li><Link to="/stock" className="hover:underline">Stock Form</Link></li>
                         <li><Link to="/stockList" className="hover:underline">Stock List</Link></li>
-        <li>
+                        <li>
                             <Link to="/loans" className="hover:underline">
                                 Préstamos
                             </Link>
