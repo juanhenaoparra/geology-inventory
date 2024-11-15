@@ -26,7 +26,6 @@ def store_stock(session: Session, stock: Stock):
 
 
 def update_stock(session: Session, stock_id: int, updated_stock: Stock) -> Stock:
-
     stock = session.get(Stock, stock_id)
 
     if not stock:
@@ -43,5 +42,17 @@ def update_stock(session: Session, stock_id: int, updated_stock: Stock) -> Stock
     except Exception as e:
         session.rollback()
         raise UpdateError(detail="Failed to update stock item") from e
+
+    return stock
+
+
+def remove_stock(session: Session, stock_id: int):
+    stock = session.get(Stock, stock_id)
+
+    if not stock:
+        raise HTTPException(status_code=404, detail="Stock item not found")
+
+    session.delete(stock)
+    session.commit()
 
     return stock
