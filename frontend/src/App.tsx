@@ -18,7 +18,7 @@ const App: React.FC = () => {
                         <li><Link to="/" className="hover:underline">Home</Link></li>
                         <li><Link to="/stock" className="hover:underline">Stock Form</Link></li>
                         <li><Link to="/stockList" className="hover:underline">Stock List</Link></li>
-        <li>
+                        <li>
                             <Link to="/loans" className="hover:underline">
                                 Préstamos
                             </Link>
