@@ -23,7 +23,7 @@ npm-install:
 	cd $(DASHBOARD_FOLDER) && $(NPM) install
 
 run-frontend:
-	cd $(DASHBOARD_FOLDER) && $(NPM) run dev
+	cd $(DASHBOARD_FOLDER) && $(NPM) run start
 
 run-backend:
 	cd $(BACKEND_FOLDER) && $(VENV_NAME)/bin/python main.py

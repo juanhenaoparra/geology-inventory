@@ -91,3 +91,13 @@ export const getLoans = async (page: number = 1, pageSize: number = 10): Promise
     return await response.json();
 };
 
+export const deleteStockItem = async (id: number): Promise<void> => {
+    const response = await fetch(`${API_HOST}/stocks/${id}`, {
+        method: 'DELETE',
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to delete stock item');
+    }
+};
+
