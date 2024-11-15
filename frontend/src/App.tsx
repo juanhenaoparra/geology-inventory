@@ -4,11 +4,7 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import StockItemForm from '@/components/pages/StockItemForm';
 import StockList from '@/components/pages/StockList';
 import LoansList from '@/components/LoansList'
-import React from 'react'
 import EditStockItemFormWrapper from './components/pages/EditStockFormWrapper';
-
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
-import StockItemForm from '@/components/StockItemForm'
 
 
 const App: React.FC = () => {
