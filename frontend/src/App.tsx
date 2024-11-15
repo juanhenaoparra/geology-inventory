@@ -1,7 +1,12 @@
+
 import React from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
-import StockItemForm from '@/components/StockItemForm'
+import StockItemForm from '@/components/pages/StockItemForm'
 import LoanReturnForm from '@/components/LoanReturnForm'
+import StockList from '@/components/pages/StockList';
+import LoansList from '@/components/LoansList'
+import EditStockItemFormWrapper from './components/pages/EditStockFormWrapper';
+
 
 const App: React.FC = () => {
     return (
@@ -10,6 +15,7 @@ const App: React.FC = () => {
                 {/* Navigation */}
                 <nav className="mb-4">
                     <ul className="flex gap-4">
+
                         <li>
                             <Link to="/" className="hover:underline">
                                 Home
@@ -25,6 +31,12 @@ const App: React.FC = () => {
                                 Loan/Return Form
                             </Link>
                         </li>
+                        <li><Link to="/stockList" className="hover:underline">Stock List</Link></li>
+                        <li>
+                            <Link to="/loans" className="hover:underline">
+                                Préstamos
+                            </Link>
+                        </li>
                     </ul>
                 </nav>
 
@@ -32,6 +44,12 @@ const App: React.FC = () => {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/stock" element={<StockItemForm />} />
+
+                    <Route path="/stockList" element={<StockList />} />
+                    <Route path="/edit-stock/:itemId" element={<EditStockItemFormWrapper />} />
+
+                    <Route path="/loans" element={<LoansList />} />
+
                     <Route path="/loan" element={<LoanReturnForm />} />
                 </Routes>
             </div>

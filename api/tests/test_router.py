@@ -21,6 +21,7 @@ def session():
     SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
         yield session
+        SQLModel.metadata.drop_all(engine)
 
 
 def test_post_store_stock_success(session):
@@ -74,3 +75,25 @@ def test_post_store_stock_fail_no_inventory_code(session):
 
     assert exec_error.value.status_code == 400
     assert "invalid input data" in str(exec_error.value.detail).lower()
+
+
+def test_delete_stock_success(session):
+    test_stock = {
+        "name": "hammer",
+        "description": "my description",
+        "inventory_code": "HM-001",
+        "quality": "ok",
+    }
+
+    response = client.post("/stock", json=test_stock)
+    assert response.status_code == 200
+
+    response = client.delete(f"/stocks/{response.json()['id']}")
+    assert response.status_code == 200
+
+
+def test_delete_stock_fail_not_found(session):
+    with pytest.raises(HTTPException) as exec_error:
+        client.delete("/stocks/101")
+
+    assert exec_error.value.status_code == 404
