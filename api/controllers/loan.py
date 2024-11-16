@@ -43,7 +43,7 @@ def loans(session: Session, page: int = 1, page_size: int = 10):
         # Incluir el nombre del usuario en los préstamos
         loans_with_user = []
         for loan, user in all_loans:
-            loan_dict = loan.dict()
+            loan_dict = loan.model_dump()
             loan_dict["user_name"] = user.name
             loans_with_user.append(loan_dict)
 
