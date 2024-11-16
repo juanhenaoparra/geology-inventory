@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { fetchStockItems, StockItem, deleteStockItem } from '../../services/StocksServices'
+import { fetchStockItems, StockItem, deleteStockItem } from '@/services/StocksServices'
 
 const StockList: React.FC = () => {
     const [stockItems, setStockItems] = useState<StockItem[]>([])
