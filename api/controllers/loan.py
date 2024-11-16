@@ -28,7 +28,8 @@ def loans(session: Session, page: int = 1, page_size: int = 10):
     """Obtener todos los préstamos paginados"""
     try:
         # Obtener el total de registros
-        total = session.query(Loan).count()
+        result = session.exec(select(func.count()).select_from(Loan))
+        total = result.scalar()
 
         # Obtener los préstamos paginados
         all_loans = session.exec(
