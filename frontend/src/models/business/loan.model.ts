@@ -6,3 +6,12 @@ export interface LoanHistory {
     observation: string
     user_name: string
 }
+
+export interface LoanData {
+    userId: string
+    stockId: string
+    loanDate: string
+    returnDate?: string
+    status: string
+    observation?: string
+}

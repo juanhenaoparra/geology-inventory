@@ -1,49 +1,48 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { fetchStockItems, StockItem, deleteStockItem } from '../../services/api';
+import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { fetchStockItems, StockItem, deleteStockItem } from '../../services/StocksServices'
 
 const StockList: React.FC = () => {
-    const [stockItems, setStockItems] = useState<StockItem[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [itemToDelete, setItemToDelete] = useState<StockItem | null>(null);
+    const [stockItems, setStockItems] = useState<StockItem[]>([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const [itemToDelete, setItemToDelete] = useState<StockItem | null>(null)
 
     useEffect(() => {
         async function loadStockItems() {
             try {
-                const items = await fetchStockItems();
-                console.log("Marlon items", items)
-                setStockItems(items);
-                setLoading(false);
+                const items = await fetchStockItems()
+                setStockItems(items)
+                setLoading(false)
             } catch (error) {
-                setError('Failed to fetch stock items');
-                setLoading(false);
+                setError('Failed to fetch stock items')
+                setLoading(false)
             }
         }
-        loadStockItems();
-    }, []);
+        loadStockItems()
+    }, [])
 
     const handleDelete = async (item: StockItem) => {
-        setItemToDelete(item);
-        setShowDeleteModal(true);
-    };
+        setItemToDelete(item)
+        setShowDeleteModal(true)
+    }
 
     const confirmDelete = async () => {
-        if (!itemToDelete) return;
+        if (!itemToDelete) return
 
         try {
-            await deleteStockItem(itemToDelete.id);
-            setStockItems(stockItems.filter(item => item.id !== itemToDelete.id));
-            setShowDeleteModal(false);
-            setItemToDelete(null);
+            await deleteStockItem(itemToDelete.id)
+            setStockItems(stockItems.filter((item) => item.id !== itemToDelete.id))
+            setShowDeleteModal(false)
+            setItemToDelete(null)
         } catch (error) {
-            setError('Failed to delete item');
+            setError('Failed to delete item')
         }
-    };
+    }
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>{error}</p>;
+    if (loading) return <p>Loading...</p>
+    if (error) return <p>{error}</p>
 
     return (
         <div>
@@ -68,7 +67,12 @@ const StockList: React.FC = () => {
                             <td className="border px-4 py-2">{item.quality}</td>
                             <td className="border px-4 py-2">{item.description}</td>
                             <td className="border px-4 py-2">
-                                <Link to={`/edit-stock/${item.id}`} className="text-blue-500 hover:underline mr-4">EDIT</Link>
+                                <Link
+                                    to={`/edit-stock/${item.id}`}
+                                    className="text-blue-500 hover:underline mr-4"
+                                >
+                                    EDIT
+                                </Link>
                                 <button
                                     onClick={() => handleDelete(item)}
                                     className="text-red-500 hover:underline"
@@ -104,7 +108,7 @@ const StockList: React.FC = () => {
                 </div>
             )}
         </div>
-    );
-};
+    )
+}
 
-export default StockList;
+export default StockList
