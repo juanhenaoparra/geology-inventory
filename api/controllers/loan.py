@@ -28,7 +28,8 @@ def loans(session: Session, page: int = 1, page_size: int = 10):
     """Obtener todos los préstamos paginados"""
     try:
         # Obtener el total de registros
-        total = session.query(Loan).count()
+        result = session.exec(select(func.count()).select_from(Loan))
+        total = result.scalar()
 
         # Obtener los préstamos paginados
         all_loans = session.exec(
@@ -43,7 +44,7 @@ def loans(session: Session, page: int = 1, page_size: int = 10):
         # Incluir el nombre del usuario en los préstamos
         loans_with_user = []
         for loan, user in all_loans:
-            loan_dict = loan.dict()
+            loan_dict = loan.model_dump()
             loan_dict["user_name"] = user.name
             loans_with_user.append(loan_dict)
 
