@@ -1,12 +1,10 @@
-
 import React from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import StockItemForm from '@/components/pages/StockItemForm'
-import LoanReturnForm from '@/components/LoanReturnForm'
-import StockList from '@/components/pages/StockList';
+import LoanPage from '@/components/pages/LoanPage'
+import StockList from '@/components/pages/StockList'
 import LoansList from '@/components/LoansList'
-import EditStockItemFormWrapper from './components/pages/EditStockFormWrapper';
-
+import EditStockItemFormWrapper from './components/pages/EditStockFormWrapper'
 
 const App: React.FC = () => {
     return (
@@ -15,7 +13,6 @@ const App: React.FC = () => {
                 {/* Navigation */}
                 <nav className="mb-4">
                     <ul className="flex gap-4">
-
                         <li>
                             <Link to="/" className="hover:underline">
                                 Home
@@ -28,10 +25,14 @@ const App: React.FC = () => {
                         </li>
                         <li>
                             <Link to="/loan" className="hover:underline">
-                                Loan/Return Form
+                                Loan
                             </Link>
                         </li>
-                        <li><Link to="/stockList" className="hover:underline">Stock List</Link></li>
+                        <li>
+                            <Link to="/stockList" className="hover:underline">
+                                Stock List
+                            </Link>
+                        </li>
                         <li>
                             <Link to="/loans" className="hover:underline">
                                 Préstamos
@@ -50,7 +51,7 @@ const App: React.FC = () => {
 
                     <Route path="/loans" element={<LoansList />} />
 
-                    <Route path="/loan" element={<LoanReturnForm />} />
+                    <Route path="/loan" element={<LoanPage />} />
                 </Routes>
             </div>
         </BrowserRouter>

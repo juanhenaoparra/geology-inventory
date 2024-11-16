@@ -1,7 +1,7 @@
 import { LoanHistory } from '@/models/business/loan.model'
 import Pagination from '@/components/ui/Pagination'
 import { useState, useEffect } from 'react'
-import { getLoans } from '@/services/api'
+import { getLoans } from '@/services/LoansServices'
 
 const LoansList: React.FC = () => {
     const [loans, setLoans] = useState<LoanHistory[]>([])

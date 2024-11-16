@@ -1,3 +1,4 @@
+// LoanPage.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -22,38 +23,37 @@ import {
 } from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
 import { Toaster } from '@/components/ui/toaster'
-import { submitLoan, fetchUsers, fetchTools, User, Tool } from '@/services/ToolsServices'
+import { fetchStockItems, StockItem } from '@/services/StocksServices'
+import { fetchUsers, User } from '@/services/UsersServices'
+import { submitLoan } from '@/services/LoansServices'
 
 interface FormData {
     userId: string
-    toolId: string
+    stockId: string
     loanDate: string
     returnDate: string
-    status: string
     observation: string
 }
 
-export default function LoanReturnForm() {
+export default function LoanPage() {
     const [formData, setFormData] = useState<FormData>({
         userId: '',
-        toolId: '',
+        stockId: '',
         loanDate: '',
         returnDate: '',
-        status: '',
         observation: '',
     })
-    const [users, setUsers] = useState<User[]>([]) // Tipo explícito User[]
-    const [tools, setTools] = useState<Tool[]>([]) // Tipo explícito Tool[]
+    const [users, setUsers] = useState<User[]>([])
+    const [stocks, setStocks] = useState<StockItem[]>([])
     const [errors, setErrors] = useState<Record<string, string>>({})
     const { toast } = useToast()
 
     useEffect(() => {
-        // Fetch users and tools data from the backend
         async function fetchData() {
             const usersData = await fetchUsers()
-            const toolsData = await fetchTools()
+            const stocksData = await fetchStockItems()
             setUsers(usersData)
-            setTools(toolsData)
+            setStocks(stocksData)
         }
         fetchData()
     }, [])
@@ -76,9 +76,8 @@ export default function LoanReturnForm() {
     const validateForm = () => {
         const newErrors: Record<string, string> = {}
         if (!formData.userId) newErrors.userId = 'User is required'
-        if (!formData.toolId) newErrors.toolId = 'Tool is required'
+        if (!formData.stockId) newErrors.stockId = 'Stock is required'
         if (!formData.loanDate) newErrors.loanDate = 'Loan date is required'
-        if (!formData.status) newErrors.status = 'Status is required'
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
     }
@@ -87,19 +86,17 @@ export default function LoanReturnForm() {
         e.preventDefault()
         if (validateForm()) {
             try {
-                await submitLoan(formData)
+                await submitLoan({ ...formData, status: 'active' })
                 toast({
                     title: 'Success',
                     description: 'Loan registered successfully!',
                     duration: 3000,
                 })
-                // Clear form after submission
                 setFormData({
                     userId: '',
-                    toolId: '',
+                    stockId: '',
                     loanDate: '',
                     returnDate: '',
-                    status: '',
                     observation: '',
                 })
             } catch (error) {
@@ -124,10 +121,8 @@ export default function LoanReturnForm() {
         <>
             <Card className="w-full max-w-md mx-auto">
                 <CardHeader>
-                    <CardTitle>Register Loan/Return</CardTitle>
-                    <CardDescription>
-                        Fill out the form to register a loan or return.
-                    </CardDescription>
+                    <CardTitle>Register New Loan</CardTitle>
+                    <CardDescription>Fill out the form to register a new loan.</CardDescription>
                 </CardHeader>
                 <form onSubmit={handleSubmit}>
                     <CardContent className="space-y-4">
@@ -154,24 +149,24 @@ export default function LoanReturnForm() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="toolId">Tool</Label>
+                            <Label htmlFor="stockId">Stock</Label>
                             <Select
-                                onValueChange={(value) => handleSelectChange('toolId', value)}
-                                value={formData.toolId}
+                                onValueChange={(value) => handleSelectChange('stockId', value)}
+                                value={formData.stockId}
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select tool" />
+                                    <SelectValue placeholder="Select stock item" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {tools.map((tool: Tool) => (
-                                        <SelectItem key={tool.id} value={tool.id.toString()}>
-                                            {tool.name}
+                                    {stocks.map((stock: StockItem) => (
+                                        <SelectItem key={stock.id} value={stock.id.toString()}>
+                                            {stock.name}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
-                            {errors.toolId && (
-                                <p className="text-sm text-red-500">{errors.toolId}</p>
+                            {errors.stockId && (
+                                <p className="text-sm text-red-500">{errors.stockId}</p>
                             )}
                         </div>
 
@@ -201,25 +196,6 @@ export default function LoanReturnForm() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="status">Status</Label>
-                            <Select
-                                onValueChange={(value) => handleSelectChange('status', value)}
-                                value={formData.status}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="active">Active</SelectItem>
-                                    <SelectItem value="returned">Returned</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            {errors.status && (
-                                <p className="text-sm text-red-500">{errors.status}</p>
-                            )}
-                        </div>
-
-                        <div className="space-y-2">
                             <Label htmlFor="observation">Observation (Optional)</Label>
                             <Textarea
                                 id="observation"
@@ -232,7 +208,7 @@ export default function LoanReturnForm() {
                     </CardContent>
                     <CardFooter>
                         <Button type="submit" className="w-full">
-                            Register Loan/Return
+                            Register Loan
                         </Button>
                     </CardFooter>
                 </form>

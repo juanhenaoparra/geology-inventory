@@ -1,64 +1,77 @@
-import { useEffect, useState } from "react";
-import { fetchStockItemById, updateStockItem, StockItem } from "../../services/api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { Toaster } from "@/components/ui/toaster";
+import { useEffect, useState } from 'react'
+import { fetchStockItemById, updateStockItem, StockItem } from '../../services/StocksServices'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+    CardFooter,
+} from '@/components/ui/card'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+import { useToast } from '@/hooks/use-toast'
+import { Toaster } from '@/components/ui/toaster'
 
 interface EditStockItemProps {
-    itemId: number;
+    itemId: number
 }
 
 export default function EditStockItemForm({ itemId }: EditStockItemProps) {
-    const [formData, setFormData] = useState<StockItem | null>(null);
-    const [loading, setLoading] = useState(true);
-    const { toast } = useToast();
+    const [formData, setFormData] = useState<StockItem | null>(null)
+    const [loading, setLoading] = useState(true)
+    const { toast } = useToast()
 
     useEffect(() => {
         async function fetchData() {
-            const item = await fetchStockItemById(itemId);
-            setFormData(item);
-            setLoading(false);
+            const item = await fetchStockItemById(itemId)
+            setFormData(item)
+            setLoading(false)
         }
-        fetchData();
-    }, [itemId]);
+        fetchData()
+    }, [itemId])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => prev ? { ...prev, [name]: value } : null);
-    };
+        const { name, value } = e.target
+        setFormData((prev) => (prev ? { ...prev, [name]: value } : null))
+    }
 
     const handleQualityChange = (value: string) => {
-        setFormData(prev => prev ? { ...prev, quality: value } : null);
-    };
+        setFormData((prev) => (prev ? { ...prev, quality: value } : null))
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+        e.preventDefault()
         if (formData) {
-            const updatedItem = await updateStockItem(itemId, formData);
+            const updatedItem = await updateStockItem(itemId, formData)
             if (updatedItem) {
                 toast({
-                    title: "Success",
-                    description: "Ítem de stock actualizado correctamente",
+                    title: 'Success',
+                    description: 'Ítem de stock actualizado correctamente',
                     duration: 3000,
-                });
-                setFormData(updatedItem);
+                })
+                setFormData(updatedItem)
             } else {
                 toast({
-                    title: "Error",
-                    description: "Error al actualizar el ítem de stock",
-                    variant: "destructive",
+                    title: 'Error',
+                    description: 'Error al actualizar el ítem de stock',
+                    variant: 'destructive',
                     duration: 3000,
-                });
+                })
             }
         }
-    };
+    }
 
-    if (loading) return <p>Cargando...</p>;
+    if (loading) return <p>Cargando...</p>
 
     return (
         <>
@@ -74,7 +87,7 @@ export default function EditStockItemForm({ itemId }: EditStockItemProps) {
                             <Input
                                 id="name"
                                 name="name"
-                                value={formData?.name || ""}
+                                value={formData?.name || ''}
                                 onChange={handleChange}
                                 placeholder="Enter item name"
                                 required
@@ -85,7 +98,7 @@ export default function EditStockItemForm({ itemId }: EditStockItemProps) {
                             <Textarea
                                 id="description"
                                 name="description"
-                                value={formData?.description || ""}
+                                value={formData?.description || ''}
                                 onChange={handleChange}
                                 placeholder="Enter item description"
                             />
@@ -95,7 +108,7 @@ export default function EditStockItemForm({ itemId }: EditStockItemProps) {
                             <Input
                                 id="inventory_code"
                                 name="inventory_code"
-                                value={formData?.inventory_code || ""}
+                                value={formData?.inventory_code || ''}
                                 onChange={handleChange}
                                 placeholder="Enter inventory code"
                                 required
@@ -103,7 +116,10 @@ export default function EditStockItemForm({ itemId }: EditStockItemProps) {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="quality">Quality</Label>
-                            <Select onValueChange={handleQualityChange} value={formData?.quality || ""}>
+                            <Select
+                                onValueChange={handleQualityChange}
+                                value={formData?.quality || ''}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select quality" />
                                 </SelectTrigger>
@@ -116,11 +132,13 @@ export default function EditStockItemForm({ itemId }: EditStockItemProps) {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button type="submit" className="w-full">Update Stock Item</Button>
+                        <Button type="submit" className="w-full">
+                            Update Stock Item
+                        </Button>
                     </CardFooter>
                 </form>
             </Card>
             <Toaster />
         </>
-    );
+    )
 }
