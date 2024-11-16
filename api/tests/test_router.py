@@ -4,9 +4,9 @@ from sqlmodel import Session, SQLModel, create_engine
 from sqlalchemy.pool import StaticPool
 from fastapi import HTTPException
 
-from routes.router import router
+from routes.stock_router import stock_router
 
-client = TestClient(router)
+stock_router = TestClient(stock_router)
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
 
@@ -32,7 +32,7 @@ def test_post_store_stock_success(session):
         "quality": "ok",
     }
 
-    response = client.post("/stock", json=test_stock)
+    response = stock_router.post("/stock", json=test_stock)
 
     assert response.status_code == 200
     data = response.json()
@@ -57,7 +57,7 @@ def test_post_store_stock_fail_no_name(session):
     }
 
     with pytest.raises(HTTPException) as exec_error:
-        client.post("/stock", json=test_stock)
+        stock_router.post("/stock", json=test_stock)
 
     assert exec_error.value.status_code == 400
     assert "invalid input data" in str(exec_error.value.detail).lower()
@@ -71,7 +71,7 @@ def test_post_store_stock_fail_no_inventory_code(session):
     }
 
     with pytest.raises(HTTPException) as exec_error:
-        client.post("/stock", json=test_stock)
+        stock_router.post("/stock", json=test_stock)
 
     assert exec_error.value.status_code == 400
     assert "invalid input data" in str(exec_error.value.detail).lower()
@@ -85,15 +85,15 @@ def test_delete_stock_success(session):
         "quality": "ok",
     }
 
-    response = client.post("/stock", json=test_stock)
+    response = stock_router.post("/stock", json=test_stock)
     assert response.status_code == 200
 
-    response = client.delete(f"/stocks/{response.json()['id']}")
+    response = stock_router.delete(f"/stocks/{response.json()['id']}")
     assert response.status_code == 200
 
 
 def test_delete_stock_fail_not_found(session):
     with pytest.raises(HTTPException) as exec_error:
-        client.delete("/stocks/101")
+        stock_router.delete("/stocks/101")
 
     assert exec_error.value.status_code == 404
