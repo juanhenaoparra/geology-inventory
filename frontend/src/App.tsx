@@ -1,10 +1,10 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
-import StockItemForm from '@/components/pages/StockItemForm'
-import LoanPage from '@/components/pages/LoanPage'
-import StockList from '@/components/pages/StockList'
-import LoansList from '@/components/LoansList'
-import EditStockItemFormWrapper from './components/pages/EditStockFormWrapper'
+import StockItemForm from '@/components/pages/Stock/StockItemForm'
+import LoanPage from '@/components/pages/Loan/LoanPage'
+import StockList from '@/components/pages/Stock/StockList'
+import LoansList from '@/components/pages/Loan/LoansList'
+import EditStockItemFormWrapper from './components/pages/Stock/EditStockFormWrapper'
 
 const App: React.FC = () => {
     return (
@@ -33,11 +33,11 @@ const App: React.FC = () => {
                                 Stock List
                             </Link>
                         </li>
-                        <li>
+                        {/* <li>
                             <Link to="/loans" className="hover:underline">
                                 Préstamos
                             </Link>
-                        </li>
+                        </li> */}
                     </ul>
                 </nav>
 
