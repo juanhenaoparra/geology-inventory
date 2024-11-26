@@ -5,7 +5,7 @@ import LoanPage from '@/components/pages/Loan/LoanPage'
 import StockList from '@/components/pages/Stock/StockList'
 import LoansList from '@/components/pages/Loan/LoansList'
 import EditStockItemFormWrapper from '@/components/pages/Stock/EditStockFormWrapper'
-import Home from '@/components/pages/Home'
+import Home from '@/components/pages/Home/Home'
 
 const Layout: React.FC = () => {
     return (

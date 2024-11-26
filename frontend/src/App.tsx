@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from '@/components/pages/Auth/LoginPage'
-import Layout from '@/components/Layout'
+import Layout from '@/components/pages/Home/Layout'
 
 const App: React.FC = () => {
     return (
