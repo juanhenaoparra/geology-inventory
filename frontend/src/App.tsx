@@ -5,6 +5,7 @@ import LoanPage from '@/components/pages/Loan/LoanPage'
 import StockList from '@/components/pages/Stock/StockList'
 import LoansList from '@/components/pages/Loan/LoansList'
 import EditStockItemFormWrapper from './components/pages/Stock/EditStockFormWrapper'
+import LoginPage from '@/components/pages/Auth/LoginPage'
 
 const App: React.FC = () => {
     return (
@@ -52,6 +53,8 @@ const App: React.FC = () => {
                     <Route path="/loans" element={<LoansList />} />
 
                     <Route path="/loan" element={<LoanPage />} />
+
+                    <Route path="/login" element={<LoginPage />} />
                 </Routes>
             </div>
         </BrowserRouter>
