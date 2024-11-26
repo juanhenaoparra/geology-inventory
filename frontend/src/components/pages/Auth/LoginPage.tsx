@@ -1,15 +1,20 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useNavigate } from 'react-router-dom'
 
 const LoginPage = () => {
+    const navigate = useNavigate()
+
     const handleGoogleLogin = () => {
         // Implementar lógica de OAuth con Google
         console.log('Iniciando sesión con Google...')
+        // Simular inicio de sesión exitoso y redirigir
+        navigate('/home')
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center p-4">
-            <Card className="w-full max-w-md">
+        <div className="min-h-screen w-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center fixed inset-0">
+            <Card className="w-full max-w-md mx-4">
                 <CardHeader className="text-center">
                     <CardTitle className="text-2xl font-bold text-slate-800">
                         Sistema de Inventario
