@@ -1,16 +1,11 @@
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useNavigate } from 'react-router-dom'
+import { initiateGoogleLogin } from '@/services/AuthService'
 import GoogleIcon from '@/assets/icons/GoogleIcon'
+import { Button } from '@/components/ui/button'
 
 const LoginPage = () => {
-    const navigate = useNavigate()
-
     const handleGoogleLogin = () => {
-        // Implementar lógica de OAuth con Google
-        console.log('Iniciando sesión con Google...')
-        // Simular inicio de sesión exitoso y redirigir
-        navigate('/home')
+        initiateGoogleLogin()
     }
 
     return (
