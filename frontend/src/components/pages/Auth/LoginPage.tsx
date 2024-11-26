@@ -28,7 +28,7 @@ const LoginPage = () => {
                         <p className="text-slate-600">
                             Bienvenido al sistema de gestión de inventario del departamento de 
                             geología. Esta plataforma te permite administrar y dar seguimiento 
-                            a todos los equipos y materiales del departamento.
+                            a todos los equipos y préstamos del departamento.
                         </p>
                     </div>
                     <Button
