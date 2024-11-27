@@ -1,7 +1,7 @@
-import { LoanHistory } from '@/models/business/loan.model'
+import { LoanHistory, LoanStatus } from '@/models/business/loan.model'
 import Pagination from '@/components/ui/Pagination'
 import { useState, useEffect } from 'react'
-import { getLoans } from '@/services/LoansServices'
+import { getLoans, updateLoanStatus } from '@/services/LoansServices'
 
 interface LoanListProps {
     onPaginationChange?: (newPage: number) => void
@@ -39,6 +39,16 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
         onPaginationChange?.(newPage)
     }
 
+    const handleStatusUpdate = async (loanId: number) => {
+        try {
+            await updateLoanStatus(loanId, LoanStatus.RETURNED)
+            const data = await getLoans(pagination.currentPage, pagination.pageSize)
+            setLoans(data.items)
+        } catch (error) {
+            console.error('Failed to update loan status:', error)
+        }
+    }
+
     return (
         <div>
             <table className="table-auto w-full text-left font-inter border">
@@ -50,6 +60,7 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
                         <th>Fecha Devolución</th>
                         <th>Descripción</th>
                         <th>Estado</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -61,6 +72,16 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
                             <td>{data.return_date}</td>
                             <td>{data.observation}</td>
                             <td>{data.status}</td>
+                            <td>
+                                {data.status !== LoanStatus.RETURNED && (
+                                    <button
+                                        onClick={() => handleStatusUpdate(data.id)}
+                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-sm"
+                                    >
+                                        Marcar como devuelto
+                                    </button>
+                                )}
+                            </td>
                         </tr>
                     ))}
                 </tbody>
