@@ -22,25 +22,3 @@ export const initiateGoogleLogin = () => {
 
     window.location.href = `${googleAuthUrl}?${queryString}`
 }
-
-export const handleGoogleCallback = async (code: string) => {
-    try {
-        const response = await fetch(`${BASE_API_HOST}/auth/google/callback`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ code }),
-        })
-
-        if (!response.ok) {
-            throw new Error('Error en la autenticación')
-        }
-
-        const data = await response.json()
-        return data.token
-    } catch (error) {
-        console.error('Error en el callback:', error)
-        throw error
-    }
-}
