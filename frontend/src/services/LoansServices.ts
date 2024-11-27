@@ -1,5 +1,5 @@
 import { LOANS_API_HOST } from './api'
-import { LoanHistory, LoanData } from '@models/business/loan.model'
+import { LoanHistory, LoanData, LoanStatus } from '@models/business/loan.model'
 
 // Función para registrar un préstamo
 export async function submitLoan(loanData: LoanData): Promise<void> {
@@ -20,10 +20,9 @@ export async function submitLoan(loanData: LoanData): Promise<void> {
     }
 }
 
-// Función para registrar la devolución de un préstamo
-export async function returnLoan(loanId: number): Promise<void> {
+export const updateLoanStatus = async (loanId: number, status: LoanStatus) => {
     try {
-        const response = await fetch(`${LOANS_API_HOST}/${loanId}/return`, {
+        const response = await fetch(`${LOANS_API_HOST}/${loanId}/status/${status}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

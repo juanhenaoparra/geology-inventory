@@ -88,7 +88,7 @@ const CreateLoanModal: React.FC<CreateLoanModalProps> = ({ onLoanCreated }) => {
         e.preventDefault()
         if (validateForm()) {
             try {
-                await submitLoan({ ...formData, status: 'active' })
+                await submitLoan(formData)
                 toast({
                     title: 'Success',
                     description: 'Loan registered successfully!',
