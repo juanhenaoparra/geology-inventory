@@ -1,5 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { getGoogleUserInfo } from '@/services/AuthService'
 
 const GoogleCallback = () => {
     const [searchParams] = useSearchParams()
@@ -14,7 +15,9 @@ const GoogleCallback = () => {
                     throw new Error('No se recibió el código de autorización')
                 }
 
-                console.log('Code recibido:', code)
+                const userInfo = await getGoogleUserInfo(code)
+                console.log('Información del usuario:', userInfo)
+                
                 navigate('/home')
             } catch (error) {
                 console.error('Error en el callback:', error)
