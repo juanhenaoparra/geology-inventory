@@ -18,7 +18,7 @@ class User(SQLModel, table=True):
     email: str
     semester: Optional[str]
     career: Optional[str]
-    student_code: str
+    student_code: Optional[str]
     subject: Optional[str]
     phone: Optional[str]
 

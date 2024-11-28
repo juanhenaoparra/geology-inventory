@@ -9,3 +9,8 @@ class LoanCreate(BaseModel):
     return_date: str = Field(alias="returnDate")
     status: str
     observation: Optional[str] = None
+
+class UserCreate(BaseModel):
+    name: str
+    email: str
+    student_code: str
