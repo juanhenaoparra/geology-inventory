@@ -13,4 +13,3 @@ class LoanCreate(BaseModel):
 class UserCreate(BaseModel):
     name: str
     email: str
-    student_code: str

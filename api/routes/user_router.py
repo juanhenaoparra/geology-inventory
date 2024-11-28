@@ -29,7 +29,7 @@ def create_or_get_user(user_data: UserCreate, session: Session = Depends(get_ses
     new_user = User(
         name=user_data.name,
         email=user_data.email,
-        student_code=user_data.student_code
+        student_code=""
     )
 
     try:
