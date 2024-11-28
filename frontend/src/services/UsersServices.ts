@@ -1,10 +1,5 @@
 import { USERS_API_HOST } from './api'
-
-export interface User {
-    id: number
-    name: string
-    email: string
-}
+import { OAuthUser, User } from '@/models/business/user.model'
 
 // Función para obtener usuarios
 export async function fetchUsers(): Promise<User[]> {
@@ -17,5 +12,26 @@ export async function fetchUsers(): Promise<User[]> {
     } catch (error) {
         console.error('Error:', error)
         return []
+    }
+}
+
+export async function registerUser(userData: OAuthUser): Promise<User> {
+    try {
+        const response = await fetch(`${USERS_API_HOST}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData),
+        })
+
+        if (!response.ok) {
+            throw new Error('Error al registrar el usuario')
+        }
+
+        return response.json()
+    } catch (error) {
+        console.error('Error:', error)
+        throw error
     }
 }
