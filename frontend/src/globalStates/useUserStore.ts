@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { User } from '@/models/business/user.model'
+import { StorageService } from '@/services/StorageService'
 
 interface UserState {
     user: User
@@ -8,7 +9,13 @@ interface UserState {
 }
 
 export const useUserStore = create<UserState>((set) => ({
-    user: {} as User,
-    setUser: (user) => set({ user }),
-    clearUser: () => set({ user: {} as User }),
+    user: StorageService.getUser() || {} as User,
+    setUser: (user) => {
+        StorageService.setUser(user)
+        set({ user })
+    },
+    clearUser: () => {
+        StorageService.clearUser()
+        set({ user: {} as User })
+    },
 }))

@@ -1,9 +1,21 @@
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useUserStore } from '@/globalStates/useUserStore'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { initiateGoogleLogin } from '@/services/AuthService'
 import GoogleIcon from '@/assets/icons/GoogleIcon'
 import { Button } from '@/components/ui/button'
 
 const LoginPage = () => {
+    const navigate = useNavigate()
+    const { user } = useUserStore()
+
+    useEffect(() => {
+        if (user?.id) {
+            navigate('/home')
+        }
+    }, [user, navigate])
+
     const handleGoogleLogin = () => {
         initiateGoogleLogin()
     }
