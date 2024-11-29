@@ -21,6 +21,7 @@ class User(SQLModel, table=True):
     student_code: Optional[str]
     subject: Optional[str]
     phone: Optional[str]
+    role: Optional[str]
 
     loans: List["UserLoan"] = Relationship(back_populates="user")
 

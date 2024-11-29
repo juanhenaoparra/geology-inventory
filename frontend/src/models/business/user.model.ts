@@ -7,6 +7,7 @@ export interface User {
     semester?: number
     student_code?: string
     phone?: string
+    role?: string
 }
 
 export interface OAuthUser {
