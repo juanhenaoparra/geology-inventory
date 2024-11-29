@@ -6,8 +6,12 @@ import StockList from '@/components/pages/Stock/StockList'
 import LoansList from '@/components/pages/Loan/LoansList'
 import EditStockItemFormWrapper from '@/components/pages/Stock/EditStockFormWrapper'
 import Home from '@/components/pages/Home/Home'
+import { useUserStore } from '@/globalStates/useUserStore'
 
 const Layout: React.FC = () => {
+    const { user } = useUserStore()
+    const isAdmin = user.role === 'admin'
+
     return (
         <div className="container mx-auto p-4">
             <nav className="mb-4">
@@ -17,19 +21,23 @@ const Layout: React.FC = () => {
                             Home
                         </Link>
                     </li>
-                    <li>
-                        <Link to="/stock" className="hover:underline">
-                            Stock Form
-                        </Link>
-                    </li>
+                    {isAdmin && (
+                        <>
+                            <li>
+                                <Link to="/stock" className="hover:underline">
+                                    Stock Form
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/stockList" className="hover:underline">
+                                    Stock List
+                                </Link>
+                            </li>
+                        </>
+                    )}
                     <li>
                         <Link to="/loan" className="hover:underline">
                             Loan
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to="/stockList" className="hover:underline">
-                            Stock List
                         </Link>
                     </li>
                 </ul>
@@ -37,9 +45,13 @@ const Layout: React.FC = () => {
 
             <Routes>
                 <Route path="/home" element={<Home />} />
-                <Route path="/stock" element={<StockItemForm />} />
-                <Route path="/stockList" element={<StockList />} />
-                <Route path="/edit-stock/:itemId" element={<EditStockItemFormWrapper />} />
+                {isAdmin && (
+                    <>
+                        <Route path="/stock" element={<StockItemForm />} />
+                        <Route path="/stockList" element={<StockList />} />
+                        <Route path="/edit-stock/:itemId" element={<EditStockItemFormWrapper />} />
+                    </>
+                )}
                 <Route path="/loans" element={<LoansList />} />
                 <Route path="/loan" element={<LoanPage />} />
             </Routes>
