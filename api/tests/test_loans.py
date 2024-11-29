@@ -5,11 +5,12 @@ import pytest
 from sqlmodel import Session, SQLModel, create_engine
 from sqlalchemy.pool import StaticPool
 from models.models import Loan, User, UserLoan, LoanStock, Stock
-from controllers.loan import loans, create_loan_with_relations
-from models.schemas import LoanCreate
+from controllers.loan import loans, create_loan_with_relations, update_loan_status
+from models.schemas import LoanCreate, LoanStatusUpdate
 
 # Configuración de la base de datos de prueba
 DATABASE_URL = "sqlite:///:memory:"
+
 
 @pytest.fixture
 def session():
@@ -24,6 +25,7 @@ def session():
         yield db_session
     SQLModel.metadata.drop_all(engine)
 
+
 @pytest.fixture
 def sample_data(session):
     """Fixture para crear datos de prueba"""
@@ -33,7 +35,7 @@ def sample_data(session):
         email="juan@test.com",
         student_code="ST001",
         semester="3",
-        career="Ingeniería"
+        career="Ingeniería",
     )
     session.add(user)
     session.commit()
@@ -43,7 +45,7 @@ def sample_data(session):
         name="Martillo",
         description="Martillo de prueba",
         inventory_code="MT001",
-        quality="Buena"
+        quality="Buena",
     )
     session.add(stock)
     session.commit()
@@ -54,8 +56,8 @@ def sample_data(session):
         loan = Loan(
             loan_date=datetime.now().strftime("%Y-%m-%d"),
             return_date=(datetime.now()).strftime("%Y-%m-%d"),
-            status="activo",
-            observation=f"Préstamo de prueba {i+1}"
+            status=LoanStatusUpdate.Pending.value,
+            observation=f"Préstamo de prueba {i+1}",
         )
         session.add(loan)
         session.commit()
@@ -72,11 +74,17 @@ def sample_data(session):
 
     return {"user": user, "stock": stock, "loans": loans_data}
 
+
 def test_create_loan_with_relations(session):
     """Probar la creación de un préstamo con sus relaciones"""
     # Crear datos de prueba
     user = User(name="Test User", email="test@example.com", student_code="ST123")
-    stock = Stock(name="Hammer", description="Heavy-duty hammer", inventory_code="HAM001", quality="Good")
+    stock = Stock(
+        name="Hammer",
+        description="Heavy-duty hammer",
+        inventory_code="HAM001",
+        quality="Good",
+    )
     session.add(user)
     session.add(stock)
     session.commit()
@@ -87,14 +95,14 @@ def test_create_loan_with_relations(session):
         stockId=stock.id,
         loanDate="2024-11-16",
         returnDate="2024-11-20",
-        status="active",
+        status=LoanStatusUpdate.Pending.value,
         observation="Test loan",
     )
     new_loan = create_loan_with_relations(session=session, loan_data=loan_data)
 
     # Verificar que el préstamo fue creado
     assert new_loan.id is not None
-    assert new_loan.status == "active"
+    assert new_loan.status == LoanStatusUpdate.Pending.value
 
     # Verificar las relaciones
     user_loan = session.query(UserLoan).filter_by(loan_id=new_loan.id).first()
@@ -102,6 +110,7 @@ def test_create_loan_with_relations(session):
 
     loan_stock = session.query(LoanStock).filter_by(loan_id=new_loan.id).first()
     assert loan_stock.stock_id == stock.id
+
 
 def test_get_loans_user_info(session, sample_data):
     """Test para probar la información del usuario en los préstamos"""
@@ -111,7 +120,18 @@ def test_get_loans_user_info(session, sample_data):
         assert "user_name" in loan
         assert loan["user_name"] == sample_data["user"].name
 
+
 def test_get_loans_empty_database(session):
     """Test para probar que no haya préstamos en una base de datos vacía"""
     result = loans(session=session)
     assert len(result.items) == 0
+
+
+def test_update_loan_status(session, sample_data):
+    """Test para probar la actualización del estado de un préstamo"""
+    loan = update_loan_status(
+        session=session,
+        loan_id=sample_data["loans"][0].id,
+        status=LoanStatusUpdate.Returned.value,
+    )
+    assert loan.status == LoanStatusUpdate.Returned.value
