@@ -21,7 +21,9 @@ export async function registerUser(userData: OAuthUser): Promise<User> {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify(userData),
         })
 

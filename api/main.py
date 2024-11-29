@@ -15,16 +15,17 @@ load_dotenv()
 app = FastAPI(lifespan=lifespan)
 
 # Configurar CORS
-allow_origins = os.getenv("ALLOWED_ORIGINS", "").split(",") if os.getenv("ALLOWED_ORIGINS") else ["*"]
-allow_methods = os.getenv("ALLOWED_METHODS", "").split(",") if os.getenv("ALLOWED_METHODS") else ["*"]
-allow_headers = os.getenv("ALLOWED_HEADERS", "").split(",") if os.getenv("ALLOWED_HEADERS") else ["*"]
+origins = [
+    "http://localhost:3000",  # Tu frontend React
+    "http://127.0.0.1:3000",
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allow_origins,
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=allow_methods,
-    allow_headers=allow_headers,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Registrar los routers
