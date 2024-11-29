@@ -16,7 +16,7 @@ app = FastAPI(lifespan=lifespan)
 
 # Configurar CORS
 origins = [
-    "http://localhost:3000",  # Tu frontend React
+    "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
 
