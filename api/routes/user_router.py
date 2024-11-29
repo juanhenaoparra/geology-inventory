@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session
+from sqlmodel import Session, select
 from models.models import User
 from models.schemas import UserCreate
 from database import get_session
@@ -20,7 +20,7 @@ def create_or_get_user(user_data: UserCreate, session: Session = Depends(get_ses
     Crea un nuevo usuario si el email no existe, o retorna el usuario existente.
     """
     # Buscar si existe un usuario con ese email
-    existing_user = session.query(User).filter(User.email == user_data.email).first()
+    existing_user = session.exec(select(User).where(User.email == user_data.email)).first()
 
     if existing_user:
         return existing_user
