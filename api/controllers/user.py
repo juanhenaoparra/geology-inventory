@@ -1,3 +1,6 @@
+"""Controlador de usuarios"""
+
+import re
 from sqlmodel import Session, select
 from models.models import User
 from models.schemas import UserCreate
@@ -5,12 +8,20 @@ from fastapi import HTTPException
 
 def get_all_users(session: Session):
     """Obtiene la lista completa de usuarios."""
-    return session.query(User).all()
+    return session.exec(select(User)).all()
+
+def validate_email(email: str) -> bool:
+    """Valida que el formato del correo electrónico sea correcto."""
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return bool(re.match(pattern, email))
 
 def create_or_get_user(user_data: UserCreate, session: Session):
     """
     Crea un nuevo usuario si el email no existe, o retorna el usuario existente.
     """
+    if not validate_email(user_data.email):
+        raise HTTPException(status_code=400, detail="Invalid email format")
+
     # Buscar si existe un usuario con ese email
     existing_user = session.exec(select(User).where(User.email == user_data.email)).first()
 

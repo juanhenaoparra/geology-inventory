@@ -1,8 +1,10 @@
 """Testing for user"""
 
-from controllers.user import create_or_get_user, get_all_users
+from controllers.user import create_or_get_user, get_all_users, validate_email
 from models.models import User
 from models.schemas import UserCreate
+import pytest
+from fastapi import HTTPException
 
 def test_create_new_user(session):
     """Probar la creación de un nuevo usuario."""
@@ -63,3 +65,29 @@ def test_get_all_users(session):
     assert len(all_users) == 2
     assert all_users[0].email == "user1@test.com"
     assert all_users[1].email == "user2@test.com"
+
+def test_create_user_invalid_email(session):
+    """Probar la creación de un usuario con email inválido."""
+    user_data = UserCreate(
+        name="Test User",
+        email="invalid-email"  # Email inválido
+    )
+
+    with pytest.raises(HTTPException) as exc_info:
+        create_or_get_user(user_data=user_data, session=session)
+
+    assert exc_info.value.status_code == 400
+    assert "Invalid email format" in str(exc_info.value.detail)
+
+def test_validate_email():
+    """Probar la función de validación de email."""
+    # Emails válidos
+    assert validate_email("user@example.com") is True
+    assert validate_email("user.name@domain.co.uk") is True
+    assert validate_email("user+label@example.com") is True
+
+    # Emails inválidos
+    assert validate_email("invalid-email") is False
+    assert validate_email("user@") is False
+    assert validate_email("@domain.com") is False
+    assert validate_email("user@domain") is False
