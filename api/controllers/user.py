@@ -12,6 +12,8 @@ def get_all_users(session: Session):
 
 def validate_email(email: str) -> bool:
     """Valida que el formato del correo electrónico sea correcto."""
+    if not email:
+        return False
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return bool(re.match(pattern, email))
 
@@ -19,6 +21,9 @@ def create_or_get_user(user_data: UserCreate, session: Session):
     """
     Crea un nuevo usuario si el email no existe, o retorna el usuario existente.
     """
+    if not user_data.email or not user_data.name:
+        raise HTTPException(status_code=400, detail="Email and name are required")
+
     if not validate_email(user_data.email):
         raise HTTPException(status_code=400, detail="Invalid email format")
 

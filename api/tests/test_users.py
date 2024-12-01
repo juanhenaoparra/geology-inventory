@@ -91,3 +91,33 @@ def test_validate_email():
     assert validate_email("user@") is False
     assert validate_email("@domain.com") is False
     assert validate_email("user@domain") is False
+
+def test_create_user_empty_email(session):
+    """Probar la creación de un usuario con email vacío."""
+    user_data = UserCreate(
+        name="Test User",
+        email=""
+    )
+
+    with pytest.raises(HTTPException) as exc_info:
+        create_or_get_user(user_data=user_data, session=session)
+
+    assert exc_info.value.status_code == 400
+    assert "Email and name are required" in str(exc_info.value.detail)
+
+def test_create_user_empty_name(session):
+    """Probar la creación de un usuario con nombre vacío."""
+    user_data = UserCreate(
+        name="",
+        email="test@example.com"
+    )
+
+    with pytest.raises(HTTPException) as exc_info:
+        create_or_get_user(user_data=user_data, session=session)
+
+    assert exc_info.value.status_code == 400
+    assert "Email and name are required" in str(exc_info.value.detail)
+
+def test_validate_email_empty():
+    """Probar la validación de email vacío."""
+    assert validate_email("") is False
