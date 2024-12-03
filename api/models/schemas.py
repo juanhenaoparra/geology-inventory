@@ -16,3 +16,7 @@ class LoanCreate(BaseModel):
     return_date: str = Field(alias="returnDate")
     status: str = Field(default=LoanStatusUpdate.Pending.value)
     observation: Optional[str] = None
+
+class UserCreate(BaseModel):
+    name: str
+    email: str
