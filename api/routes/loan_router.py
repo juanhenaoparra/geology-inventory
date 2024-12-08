@@ -4,20 +4,23 @@ from models.schemas import LoanCreate, LoanStatusUpdate
 import controllers.loan
 from database import get_session
 from controllers.exceptions import UserError
+from typing import Optional
 
-# Inicializar el router para loans
 loan_router = APIRouter()
 
 
-# Obtener todos los préstamos paginados
-@loan_router.get("/", summary="Get all loans", tags=["Loans"])
+@loan_router.get("/", summary="Get loans based on user role", tags=["Loans"])
 def get_loans(
+    user_id: int = Query(..., description="ID del usuario solicitante"),
+    user_role: str = Query(..., description="Rol del usuario"),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
     session: Session = Depends(get_session),
 ):
-    """Obtiene todos los préstamos de manera paginada."""
-    return controllers.loan.loans(session=session, page=page, page_size=page_size)
+    """Obtiene préstamos basados en el rol del usuario."""
+    return controllers.loan.loans(
+        session=session, user_id=user_id, user_role=user_role, page=page, page_size=page_size
+    )
 
 
 # Crear un nuevo préstamo
@@ -44,9 +47,7 @@ def update_loan_status(
     loan_id: int, status: LoanStatusUpdate, session: Session = Depends(get_session)
 ):
     """Actualiza el estado de un préstamo existente, la fecha de devolución y el estado de los items del préstamo."""
-
     loan = controllers.loan.update_loan_status(
         session=session, loan_id=loan_id, status=status.value
     )
-
     return loan

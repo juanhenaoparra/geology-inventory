@@ -17,6 +17,7 @@ class LoanCreate(BaseModel):
     status: str = Field(default=LoanStatusUpdate.Pending.value)
     observation: Optional[str] = None
 
+
 class UserCreate(BaseModel):
     name: str
     email: str
