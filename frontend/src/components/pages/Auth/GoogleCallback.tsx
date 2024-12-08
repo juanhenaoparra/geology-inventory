@@ -10,36 +10,38 @@ const GoogleCallback = () => {
     const [isProcessing, setIsProcessing] = useState(true)
     const setUser = useUserStore((state) => state.setUser)
 
-    useEffect(() => {
-        const processCallback = async () => {
-            try {
-                const code = searchParams.get('code')
-                if (!code) {
-                    throw new Error('No se recibió el código de autorización')
-                }
-
-                const googleUserInfo = await getGoogleUserInfo(code)
-                
-                // Registrar el usuario en el backend
-                const oauthUser = {
-                    email: googleUserInfo.email,
-                    name: googleUserInfo.given_name + ' ' + googleUserInfo.family_name,
-                }
-                
-                const registeredUser = await registerUser(oauthUser)
-                
-                // Guardar el usuario en el estado global
-                setUser(registeredUser)
-                
-                navigate('/home')
-            } catch (error) {
-                console.error('Error en el callback:', error)
-                navigate('/login')
-            } finally {
-                setIsProcessing(false)
+    const processCallback = async () => {
+        try {
+            const code = searchParams.get('code')
+            if (!code) {
+                throw new Error('No se recibió el código de autorización')
             }
-        }
 
+            const googleUserInfo = await getGoogleUserInfo(code)
+
+            const oauthUser = {
+                email: googleUserInfo.email,
+                name: googleUserInfo.given_name + ' ' + googleUserInfo.family_name,
+            }
+
+            const registeredUser = await registerUser(oauthUser)
+            console.log('Usuario registrado:', registeredUser)
+
+            if (registeredUser.student_code) {
+                setUser(registeredUser)
+                navigate('/home')
+            } else {
+                navigate('/register')
+            }
+        } catch (error) {
+            console.error('Error en el callback:', error)
+            navigate('/login')
+        } finally {
+            setIsProcessing(false)
+        }
+    }
+
+    useEffect(() => {
         processCallback()
     }, [searchParams, navigate, setUser])
 
