@@ -8,7 +8,7 @@ const GoogleCallback = () => {
     const [searchParams] = useSearchParams()
     const navigate = useNavigate()
     const [isProcessing, setIsProcessing] = useState(true)
-    const setUser = useUserStore((state) => state.setUser)
+    const { setUser } = useUserStore()
 
     const processCallback = async () => {
         try {
@@ -16,21 +16,18 @@ const GoogleCallback = () => {
             if (!code) {
                 throw new Error('No se recibió el código de autorización')
             }
-
             const googleUserInfo = await getGoogleUserInfo(code)
-
             const oauthUser = {
                 email: googleUserInfo.email,
-                name: googleUserInfo.given_name + ' ' + googleUserInfo.family_name,
+                name: `${googleUserInfo.given_name} ${googleUserInfo.family_name}`,
             }
-
             const registeredUser = await registerUser(oauthUser)
             console.log('Usuario registrado:', registeredUser)
-
             if (registeredUser.student_code) {
                 setUser(registeredUser)
                 navigate('/home')
             } else {
+                setUser(registeredUser)
                 navigate('/register')
             }
         } catch (error) {

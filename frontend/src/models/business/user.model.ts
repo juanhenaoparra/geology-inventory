@@ -3,7 +3,7 @@ export interface User {
     email: string
     name: string
     career?: string
-    semester?: number
+    semester?: string
     student_code?: string
     phone?: string
     role?: string
