@@ -1,6 +1,16 @@
 import { LOANS_API_HOST } from './api'
 import { LoanHistory, LoanData, LoanStatus } from '@models/business/loan.model'
 
+interface PaginatedResponse<T> {
+    items: T[]
+    total: number
+    page: number
+    page_size: number
+    pages: number
+    has_next: boolean
+    has_prev: boolean
+}
+
 // Función para registrar un préstamo
 export async function submitLoan(loanData: LoanData): Promise<void> {
     try {
@@ -37,22 +47,20 @@ export const updateLoanStatus = async (loanId: number, status: LoanStatus) => {
     }
 }
 
-// Función para obtener préstamos paginados
-interface PaginatedResponse<T> {
-    items: T[]
-    total: number
-    page: number
-    page_size: number
-    pages: number
-    has_next: boolean
-    has_prev: boolean
-}
-
 export const getLoans = async (
+    userId: number,
+    userRole: string,
     page: number = 1,
     pageSize: number = 10,
 ): Promise<PaginatedResponse<LoanHistory>> => {
-    const response = await fetch(`${LOANS_API_HOST}?page=${page}&page_size=${pageSize}`)
+    const queryParams = new URLSearchParams({
+        user_id: userId.toString(),
+        user_role: userRole,
+        page: page.toString(),
+        page_size: pageSize.toString(),
+    })
+
+    const response = await fetch(`${LOANS_API_HOST}?${queryParams}`)
     if (!response.ok) {
         throw new Error('Error al obtener los préstamos')
     }

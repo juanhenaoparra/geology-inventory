@@ -2,12 +2,14 @@ import { LoanHistory, LoanStatus } from '@/models/business/loan.model'
 import Pagination from '@/components/ui/Pagination'
 import { useState, useEffect } from 'react'
 import { getLoans, updateLoanStatus } from '@/services/LoansServices'
+import { useUserStore } from '@/globalStates/useUserStore'
 
 interface LoanListProps {
     onPaginationChange?: (newPage: number) => void
 }
 
 const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
+    const { user } = useUserStore()
     const [loans, setLoans] = useState<LoanHistory[]>([])
     const [pagination, setPagination] = useState({
         currentPage: 1,
@@ -19,17 +21,38 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
     })
 
     useEffect(() => {
-        getLoans(pagination.currentPage, pagination.pageSize).then((data) => {
-            setLoans(data.items)
-            setPagination((prev) => ({
-                ...prev,
-                totalItems: data.total,
-                totalPages: data.pages,
-                hasNext: data.has_next,
-                hasPrev: data.has_prev,
-            }))
-        })
-    }, [pagination.currentPage, pagination.pageSize])
+        const fetchLoans = async () => {
+            try {
+                // Garantizamos que user.role siempre tenga un valor
+                const role = user.role ?? '' // Si `role` es undefined, se asigna una cadena vacía
+                const userId = user.id // user.id siempre debe ser un número válido
+
+                if (!role || userId === undefined) {
+                    console.error('Invalid user role or user ID.')
+                    return
+                }
+
+                const data = await getLoans(
+                    userId,
+                    role,
+                    pagination.currentPage,
+                    pagination.pageSize,
+                )
+                setLoans(data.items)
+                setPagination((prev) => ({
+                    ...prev,
+                    totalItems: data.total,
+                    totalPages: data.pages,
+                    hasNext: data.has_next,
+                    hasPrev: data.has_prev,
+                }))
+            } catch (error) {
+                console.error('Error fetching loans:', error)
+            }
+        }
+
+        fetchLoans()
+    }, [pagination.currentPage, pagination.pageSize, user])
 
     const handlePaginationChange = (newPage: number) => {
         setPagination((prev) => ({
@@ -42,7 +65,17 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
     const handleStatusUpdate = async (loanId: number) => {
         try {
             await updateLoanStatus(loanId, LoanStatus.RETURNED)
-            const data = await getLoans(pagination.currentPage, pagination.pageSize)
+
+            // Garantizamos que role y userId tengan valores válidos
+            const role = user.role ?? ''
+            const userId = user.id
+
+            if (!role || userId === undefined) {
+                console.error('Invalid user role or user ID.')
+                return
+            }
+
+            const data = await getLoans(userId, role, pagination.currentPage, pagination.pageSize)
             setLoans(data.items)
         } catch (error) {
             console.error('Failed to update loan status:', error)
