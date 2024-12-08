@@ -19,10 +19,8 @@ class User(SQLModel, table=True):
     semester: Optional[str]
     career: Optional[str]
     student_code: Optional[str]
-    subject: Optional[str]
     phone: Optional[str]
     role: Optional[str]
-
     loans: List["UserLoan"] = Relationship(back_populates="user")
 
 
@@ -32,7 +30,7 @@ class Loan(SQLModel, table=True):
     return_date: str
     status: str
     observation: Optional[str]
-
+    subject: Optional[str]
     users: List["UserLoan"] = Relationship(back_populates="loan")
     stocks: List["LoanStock"] = Relationship(back_populates="loan")
 

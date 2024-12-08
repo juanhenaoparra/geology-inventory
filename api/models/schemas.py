@@ -20,3 +20,13 @@ class LoanCreate(BaseModel):
 class UserCreate(BaseModel):
     name: str
     email: str
+
+# schemas.py
+class UserUpdate(BaseModel):
+    name: Optional[str]
+    email: Optional[str]
+    semester: Optional[str]
+    career: Optional[str]
+    student_code: Optional[str]
+    phone: Optional[str]
+    role: Optional[str]
