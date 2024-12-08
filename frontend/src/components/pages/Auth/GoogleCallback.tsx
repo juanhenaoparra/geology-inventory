@@ -22,7 +22,6 @@ const GoogleCallback = () => {
                 name: `${googleUserInfo.given_name} ${googleUserInfo.family_name}`,
             }
             const registeredUser = await registerUser(oauthUser)
-            console.log('Usuario registrado:', registeredUser)
             if (registeredUser.student_code) {
                 setUser(registeredUser)
                 navigate('/home')

@@ -23,9 +23,8 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
     useEffect(() => {
         const fetchLoans = async () => {
             try {
-                // Garantizamos que user.role siempre tenga un valor
-                const role = user.role ?? '' // Si `role` es undefined, se asigna una cadena vacía
-                const userId = user.id // user.id siempre debe ser un número válido
+                const role = user.role ?? ''
+                const userId = user.id
 
                 if (!role || userId === undefined) {
                     console.error('Invalid user role or user ID.')
@@ -66,7 +65,6 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
         try {
             await updateLoanStatus(loanId, LoanStatus.RETURNED)
 
-            // Garantizamos que role y userId tengan valores válidos
             const role = user.role ?? ''
             const userId = user.id
 
@@ -93,7 +91,7 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
                         <th>Fecha Devolución</th>
                         <th>Descripción</th>
                         <th>Estado</th>
-                        <th>Acciones</th>
+                        {user.role === 'admin' && <th>Acciones</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -105,16 +103,18 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
                             <td>{data.return_date}</td>
                             <td>{data.observation}</td>
                             <td>{data.status}</td>
-                            <td>
-                                {data.status !== LoanStatus.RETURNED && (
-                                    <button
-                                        onClick={() => handleStatusUpdate(data.id)}
-                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-sm"
-                                    >
-                                        Marcar como devuelto
-                                    </button>
-                                )}
-                            </td>
+                            {user.role === 'admin' && (
+                                <td>
+                                    {data.status !== LoanStatus.RETURNED && (
+                                        <button
+                                            onClick={() => handleStatusUpdate(data.id)}
+                                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-sm"
+                                        >
+                                            Marcar como devuelto
+                                        </button>
+                                    )}
+                                </td>
+                            )}
                         </tr>
                     ))}
                 </tbody>

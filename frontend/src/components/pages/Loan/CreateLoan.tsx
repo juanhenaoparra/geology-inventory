@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 import {
     Select,
     SelectContent,
@@ -12,17 +12,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import { Toaster } from '@/components/ui/toaster'
-import {
-    Dialog,
-    DialogTrigger,
-    DialogContent,
-    DialogTitle,
-    DialogDescription,
-} from '@/components/ui/dialog'
 import { fetchStockItems, StockItem } from '@/services/StocksServices'
-import { fetchUsers, User } from '@/services/UsersServices'
+import { fetchUsers } from '@/services/UsersServices'
 import { submitLoan } from '@/services/LoansServices'
+import { User } from '@/models/business/user.model'
 import { useToast } from '@/hooks/use-toast'
 
 interface FormData {
@@ -33,11 +26,7 @@ interface FormData {
     observation: string
 }
 
-interface CreateLoanModalProps {
-    onLoanCreated?: () => void
-}
-
-const CreateLoanModal: React.FC<CreateLoanModalProps> = ({ onLoanCreated }) => {
+const LoanCreationPage = () => {
     const [formData, setFormData] = useState<FormData>({
         userId: '',
         stockId: '',
@@ -52,10 +41,14 @@ const CreateLoanModal: React.FC<CreateLoanModalProps> = ({ onLoanCreated }) => {
 
     useEffect(() => {
         async function fetchData() {
-            const usersData = await fetchUsers()
-            const stocksData = await fetchStockItems()
-            setUsers(usersData)
-            setStocks(stocksData)
+            try {
+                const usersData = await fetchUsers()
+                const stocksData = await fetchStockItems()
+                setUsers(usersData)
+                setStocks(stocksData)
+            } catch (error) {
+                console.error('Error al cargar datos:', error)
+            }
         }
         fetchData()
     }, [])
@@ -77,9 +70,9 @@ const CreateLoanModal: React.FC<CreateLoanModalProps> = ({ onLoanCreated }) => {
 
     const validateForm = () => {
         const newErrors: Record<string, string> = {}
-        if (!formData.userId) newErrors.userId = 'User is required'
-        if (!formData.stockId) newErrors.stockId = 'Stock is required'
-        if (!formData.loanDate) newErrors.loanDate = 'Loan date is required'
+        if (!formData.userId) newErrors.userId = 'El usuario es obligatorio'
+        if (!formData.stockId) newErrors.stockId = 'El stock es obligatorio'
+        if (!formData.loanDate) newErrors.loanDate = 'La fecha de préstamo es obligatoria'
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
     }
@@ -90,8 +83,8 @@ const CreateLoanModal: React.FC<CreateLoanModalProps> = ({ onLoanCreated }) => {
             try {
                 await submitLoan(formData)
                 toast({
-                    title: 'Success',
-                    description: 'Loan registered successfully!',
+                    title: '¡Éxito!',
+                    description: 'Préstamo registrado con éxito.',
                     duration: 3000,
                 })
                 setFormData({
@@ -101,11 +94,10 @@ const CreateLoanModal: React.FC<CreateLoanModalProps> = ({ onLoanCreated }) => {
                     returnDate: '',
                     observation: '',
                 })
-                if (onLoanCreated) onLoanCreated()
             } catch (error) {
                 toast({
                     title: 'Error',
-                    description: 'Failed to register loan. Please try again.',
+                    description: 'No se pudo registrar el préstamo. Intenta nuevamente.',
                     variant: 'destructive',
                     duration: 3000,
                 })
@@ -113,7 +105,7 @@ const CreateLoanModal: React.FC<CreateLoanModalProps> = ({ onLoanCreated }) => {
         } else {
             toast({
                 title: 'Error',
-                description: 'Please fill in all required fields correctly.',
+                description: 'Por favor completa los campos obligatorios.',
                 variant: 'destructive',
                 duration: 3000,
             })
@@ -121,56 +113,55 @@ const CreateLoanModal: React.FC<CreateLoanModalProps> = ({ onLoanCreated }) => {
     }
 
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button>Create New Loan</Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogTitle>Create New Loan</DialogTitle>
-                <DialogDescription>Fill out the form below to create a new loan.</DialogDescription>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="userId">User</Label>
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <form
+                onSubmit={handleSubmit}
+                className="bg-white p-6 rounded shadow-md w-full max-w-lg"
+            >
+                <h2 className="text-2xl font-bold mb-4">Registrar Préstamo</h2>
+                <div className="space-y-4">
+                    <div>
+                        <Label htmlFor="userId">Usuario</Label>
                         <Select
                             onValueChange={(value) => handleSelectChange('userId', value)}
                             value={formData.userId}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="Select user" />
+                                <SelectValue placeholder="Seleccionar usuario" />
                             </SelectTrigger>
                             <SelectContent>
-                                {users.map((user: User) => (
+                                {users.map((user) => (
                                     <SelectItem key={user.id} value={user.id.toString()}>
                                         {user.name}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
-                        {errors.userId && <p className="text-sm text-red-500">{errors.userId}</p>}
+                        {errors.userId && <p className="text-red-500 text-sm">{errors.userId}</p>}
                     </div>
 
-                    <div className="space-y-2">
+                    <div>
                         <Label htmlFor="stockId">Stock</Label>
                         <Select
                             onValueChange={(value) => handleSelectChange('stockId', value)}
                             value={formData.stockId}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="Select stock item" />
+                                <SelectValue placeholder="Seleccionar item de stock" />
                             </SelectTrigger>
                             <SelectContent>
-                                {stocks.map((stock: StockItem) => (
+                                {stocks.map((stock) => (
                                     <SelectItem key={stock.id} value={stock.id.toString()}>
                                         {stock.name}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
-                        {errors.stockId && <p className="text-sm text-red-500">{errors.stockId}</p>}
+                        {errors.stockId && <p className="text-red-500 text-sm">{errors.stockId}</p>}
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="loanDate">Loan Date</Label>
+                    <div>
+                        <Label htmlFor="loanDate">Fecha de Préstamo</Label>
                         <Input
                             id="loanDate"
                             name="loanDate"
@@ -179,12 +170,12 @@ const CreateLoanModal: React.FC<CreateLoanModalProps> = ({ onLoanCreated }) => {
                             onChange={handleChange}
                         />
                         {errors.loanDate && (
-                            <p className="text-sm text-red-500">{errors.loanDate}</p>
+                            <p className="text-red-500 text-sm">{errors.loanDate}</p>
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="returnDate">Return Date</Label>
+                    <div>
+                        <Label htmlFor="returnDate">Fecha de Devolución</Label>
                         <Input
                             id="returnDate"
                             name="returnDate"
@@ -194,24 +185,24 @@ const CreateLoanModal: React.FC<CreateLoanModalProps> = ({ onLoanCreated }) => {
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="observation">Observation (Optional)</Label>
+                    <div>
+                        <Label htmlFor="observation">Observaciones (Opcional)</Label>
                         <Textarea
                             id="observation"
                             name="observation"
                             value={formData.observation}
                             onChange={handleChange}
-                            placeholder="Enter any observations"
+                            placeholder="Añade observaciones (opcional)"
                         />
                     </div>
-                    <Button type="submit" className="w-full">
-                        Register Loan
+
+                    <Button type="submit" className="w-full mt-4">
+                        Registrar Préstamo
                     </Button>
-                </form>
-                <Toaster />
-            </DialogContent>
-        </Dialog>
+                </div>
+            </form>
+        </div>
     )
 }
 
-export default CreateLoanModal
+export default LoanCreationPage
