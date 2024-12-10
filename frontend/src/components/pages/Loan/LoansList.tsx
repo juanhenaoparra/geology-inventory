@@ -2,12 +2,14 @@ import { LoanHistory, LoanStatus } from '@/models/business/loan.model'
 import Pagination from '@/components/ui/Pagination'
 import { useState, useEffect } from 'react'
 import { getLoans, updateLoanStatus } from '@/services/LoansServices'
+import { useUserStore } from '@/globalStates/useUserStore'
 
 interface LoanListProps {
     onPaginationChange?: (newPage: number) => void
 }
 
 const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
+    const { user } = useUserStore()
     const [loans, setLoans] = useState<LoanHistory[]>([])
     const [pagination, setPagination] = useState({
         currentPage: 1,
@@ -18,9 +20,18 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
         hasPrev: false,
     })
 
-    useEffect(() => {
-        getLoans(pagination.currentPage, pagination.pageSize).then((data) => {
-            setLoans(data.items)
+    const fetchLoans = async () => {
+        try {
+            const role = user.role ?? ''
+            const userId = user.id
+
+            if (!role || userId === undefined) {
+                console.error('Invalid user role or user ID.')
+                return
+            }
+
+            const data = await getLoans(userId, role, pagination.currentPage, pagination.pageSize)
+            setLoans(data.items) // Reemplaza los datos, no los acumula.
             setPagination((prev) => ({
                 ...prev,
                 totalItems: data.total,
@@ -28,8 +39,15 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
                 hasNext: data.has_next,
                 hasPrev: data.has_prev,
             }))
-        })
-    }, [pagination.currentPage, pagination.pageSize])
+        } catch (error) {
+            console.error('Error fetching loans:', error)
+        }
+    }
+
+    useEffect(() => {
+        fetchLoans()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pagination.currentPage, pagination.pageSize]) // Actualiza solo cuando cambian estos valores.
 
     const handlePaginationChange = (newPage: number) => {
         setPagination((prev) => ({
@@ -42,8 +60,7 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
     const handleStatusUpdate = async (loanId: number) => {
         try {
             await updateLoanStatus(loanId, LoanStatus.RETURNED)
-            const data = await getLoans(pagination.currentPage, pagination.pageSize)
-            setLoans(data.items)
+            fetchLoans() // Refresca la lista después de actualizar el estado.
         } catch (error) {
             console.error('Failed to update loan status:', error)
         }
@@ -60,7 +77,7 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
                         <th>Fecha Devolución</th>
                         <th>Descripción</th>
                         <th>Estado</th>
-                        <th>Acciones</th>
+                        {user.role === 'admin' && <th>Acciones</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -72,16 +89,18 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
                             <td>{data.return_date}</td>
                             <td>{data.observation}</td>
                             <td>{data.status}</td>
-                            <td>
-                                {data.status !== LoanStatus.RETURNED && (
-                                    <button
-                                        onClick={() => handleStatusUpdate(data.id)}
-                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-sm"
-                                    >
-                                        Marcar como devuelto
-                                    </button>
-                                )}
-                            </td>
+                            {user.role === 'admin' && (
+                                <td>
+                                    {data.status !== LoanStatus.RETURNED && (
+                                        <button
+                                            onClick={() => handleStatusUpdate(data.id)}
+                                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-sm"
+                                        >
+                                            Marcar como devuelto
+                                        </button>
+                                    )}
+                                </td>
+                            )}
                         </tr>
                     ))}
                 </tbody>

@@ -3,8 +3,7 @@ export interface User {
     email: string
     name: string
     career?: string
-    subject?: string
-    semester?: number
+    semester?: string
     student_code?: string
     phone?: string
     role?: string
@@ -14,4 +13,3 @@ export interface OAuthUser {
     email: string
     name: string
 }
-

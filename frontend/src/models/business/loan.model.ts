@@ -1,6 +1,6 @@
 export enum LoanStatus {
     RETURNED = 'devuelto',
-    PENDING = 'pendiente'
+    PENDING = 'pendiente',
 }
 
 export interface LoanHistory {
@@ -19,4 +19,5 @@ export interface LoanData {
     returnDate?: string
     status?: string
     observation?: string
+    subject?: string
 }
