@@ -1,5 +1,5 @@
 import { LOANS_API_HOST } from './api'
-import { LoanHistory, LoanData, LoanStatus } from '@models/business/loan.model'
+import { LoanHistory, LoanStatus } from '@models/business/loan.model'
 
 interface PaginatedResponse<T> {
     items: T[]
@@ -11,23 +11,15 @@ interface PaginatedResponse<T> {
     has_prev: boolean
 }
 
-// Función para registrar un préstamo
-export async function submitLoan(loanData: LoanData): Promise<void> {
-    try {
-        const response = await fetch(`${LOANS_API_HOST}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(loanData),
-        })
-        if (!response.ok) {
-            throw new Error('Error al registrar el préstamo')
-        }
-    } catch (error) {
-        console.error('Error:', error)
-        throw error
-    }
+export async function submitLoan(payload: any): Promise<Response> {
+    const response = await fetch('http://localhost:8001/api/loans', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+    })
+    return response
 }
 
 export const updateLoanStatus = async (loanId: number, status: LoanStatus) => {

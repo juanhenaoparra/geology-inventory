@@ -13,43 +13,53 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { fetchStockItems, StockItem } from '@/services/StocksServices'
-import { fetchUsers } from '@/services/UsersServices'
 import { submitLoan } from '@/services/LoansServices'
-import { User } from '@/models/business/user.model'
 import { useToast } from '@/hooks/use-toast'
+import { useUserStore } from '@/globalStates/useUserStore'
+import { v4 as uuidv4 } from 'uuid'
+import { useNavigate } from 'react-router-dom'
 
 interface FormData {
-    userId: string
     stockId: string
     loanDate: string
     returnDate: string
     observation: string
 }
 
-const LoanCreationPage = () => {
+interface GroupMember {
+    id: string
+    name: string
+    student_code: string
+}
+
+const CreateLoanPage = () => {
+    const { user } = useUserStore()
     const [formData, setFormData] = useState<FormData>({
-        userId: '',
         stockId: '',
         loanDate: '',
         returnDate: '',
         observation: '',
     })
-    const [users, setUsers] = useState<User[]>([])
+    const [groupMembers, setGroupMembers] = useState<GroupMember[]>([])
     const [stocks, setStocks] = useState<StockItem[]>([])
     const [errors, setErrors] = useState<Record<string, string>>({})
     const { toast } = useToast()
+    const navigate = useNavigate()
+
+    async function fetchData() {
+        try {
+            const stocksData = await fetchStockItems()
+            setStocks(stocksData)
+        } catch (error) {
+            toast({
+                title: 'Error',
+                description: 'Error al cargar los datos de stock.',
+                variant: 'destructive',
+            })
+        }
+    }
 
     useEffect(() => {
-        async function fetchData() {
-            try {
-                const usersData = await fetchUsers()
-                const stocksData = await fetchStockItems()
-                setUsers(usersData)
-                setStocks(stocksData)
-            } catch (error) {
-                console.error('Error al cargar datos:', error)
-            }
-        }
         fetchData()
     }, [])
 
@@ -68,9 +78,19 @@ const LoanCreationPage = () => {
         }
     }
 
+    const handleAddGroupMember = () => {
+        setGroupMembers([...groupMembers, { id: uuidv4(), name: '', student_code: '' }])
+    }
+
+    const handleGroupMemberChange = (id: string, field: keyof GroupMember, value: string) => {
+        const updatedMembers = groupMembers.map((member) =>
+            member.id === id ? { ...member, [field]: value } : member,
+        )
+        setGroupMembers(updatedMembers)
+    }
+
     const validateForm = () => {
         const newErrors: Record<string, string> = {}
-        if (!formData.userId) newErrors.userId = 'El usuario es obligatorio'
         if (!formData.stockId) newErrors.stockId = 'El stock es obligatorio'
         if (!formData.loanDate) newErrors.loanDate = 'La fecha de préstamo es obligatoria'
         setErrors(newErrors)
@@ -81,25 +101,33 @@ const LoanCreationPage = () => {
         e.preventDefault()
         if (validateForm()) {
             try {
-                await submitLoan(formData)
-                toast({
-                    title: '¡Éxito!',
-                    description: 'Préstamo registrado con éxito.',
-                    duration: 3000,
-                })
-                setFormData({
-                    userId: '',
-                    stockId: '',
-                    loanDate: '',
-                    returnDate: '',
-                    observation: '',
-                })
+                const payload = {
+                    ...formData,
+                    userId: user.id.toString(),
+                    external_users: groupMembers.map(({ id, ...rest }) => rest),
+                }
+                const response = await submitLoan(payload)
+
+                if (response.ok) {
+                    toast({
+                        title: '¡Éxito!',
+                        description: 'Préstamo registrado con éxito.',
+                    })
+                    navigate('/loans') // Redirigir a la página de préstamos
+                } else {
+                    toast({
+                        title: 'Error',
+                        description: `Error al registrar el préstamo: ${
+                            response.statusText || 'Algo salió mal.'
+                        }`,
+                        variant: 'destructive',
+                    })
+                }
             } catch (error) {
                 toast({
                     title: 'Error',
-                    description: 'No se pudo registrar el préstamo. Intenta nuevamente.',
+                    description: 'Hubo un problema al registrar el préstamo.',
                     variant: 'destructive',
-                    duration: 3000,
                 })
             }
         } else {
@@ -107,7 +135,6 @@ const LoanCreationPage = () => {
                 title: 'Error',
                 description: 'Por favor completa los campos obligatorios.',
                 variant: 'destructive',
-                duration: 3000,
             })
         }
     }
@@ -120,26 +147,6 @@ const LoanCreationPage = () => {
             >
                 <h2 className="text-2xl font-bold mb-4">Registrar Préstamo</h2>
                 <div className="space-y-4">
-                    <div>
-                        <Label htmlFor="userId">Usuario</Label>
-                        <Select
-                            onValueChange={(value) => handleSelectChange('userId', value)}
-                            value={formData.userId}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Seleccionar usuario" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {users.map((user) => (
-                                    <SelectItem key={user.id} value={user.id.toString()}>
-                                        {user.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        {errors.userId && <p className="text-red-500 text-sm">{errors.userId}</p>}
-                    </div>
-
                     <div>
                         <Label htmlFor="stockId">Stock</Label>
                         <Select
@@ -196,6 +203,35 @@ const LoanCreationPage = () => {
                         />
                     </div>
 
+                    <div>
+                        <Label>Miembros del Grupo</Label>
+                        {groupMembers.map((member) => (
+                            <div key={member.id} className="flex space-x-2 mb-2">
+                                <Input
+                                    placeholder="Nombre"
+                                    value={member.name}
+                                    onChange={(e) =>
+                                        handleGroupMemberChange(member.id, 'name', e.target.value)
+                                    }
+                                />
+                                <Input
+                                    placeholder="Código de estudiante"
+                                    value={member.student_code}
+                                    onChange={(e) =>
+                                        handleGroupMemberChange(
+                                            member.id,
+                                            'student_code',
+                                            e.target.value,
+                                        )
+                                    }
+                                />
+                            </div>
+                        ))}
+                        <Button type="button" onClick={handleAddGroupMember}>
+                            Agregar Miembro
+                        </Button>
+                    </div>
+
                     <Button type="submit" className="w-full mt-4">
                         Registrar Préstamo
                     </Button>
@@ -205,4 +241,4 @@ const LoanCreationPage = () => {
     )
 }
 
-export default LoanCreationPage
+export default CreateLoanPage
