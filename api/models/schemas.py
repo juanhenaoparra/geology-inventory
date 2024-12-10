@@ -1,12 +1,17 @@
 # schemas.py
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 from enum import Enum
 
 
 class LoanStatusUpdate(str, Enum):
     Pending = "pendiente"
     Returned = "devuelto"
+
+
+class ExternalUser(BaseModel):
+    name: str
+    student_code: str
 
 
 class LoanCreate(BaseModel):
@@ -16,6 +21,8 @@ class LoanCreate(BaseModel):
     return_date: str = Field(alias="returnDate")
     status: str = Field(default=LoanStatusUpdate.Pending.value)
     observation: Optional[str] = None
+    external_users: List[ExternalUser] = []
+
 
 
 class UserCreate(BaseModel):

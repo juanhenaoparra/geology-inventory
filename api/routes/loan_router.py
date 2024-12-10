@@ -23,10 +23,9 @@ def get_loans(
     )
 
 
-# Crear un nuevo préstamo
-@loan_router.post("/", summary="Create a new loan", tags=["Loans"])
+@loan_router.post("/", summary="Create a new loan with group members", tags=["Loans"])
 def create_loan(loan_data: LoanCreate, session: Session = Depends(get_session)):
-    """Crea un nuevo préstamo y sus relaciones."""
+    """Crea un nuevo préstamo con usuarios adicionales del grupo."""
     try:
         new_loan = controllers.loan.create_loan_with_relations(
             session=session, loan_data=loan_data
@@ -36,6 +35,7 @@ def create_loan(loan_data: LoanCreate, session: Session = Depends(get_session)):
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+
 
 
 @loan_router.put(

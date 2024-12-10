@@ -14,7 +14,6 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-
 def stock_loan_history(session: Session, stock_id: int):
     """Get the loan history for a stock"""
     try:
@@ -27,7 +26,6 @@ def stock_loan_history(session: Session, stock_id: int):
         raise UserError(
             detail="An unexpected error occurred while getting stock loan history."
         ) from exc
-
 
 def loans(session: Session, user_id: int, user_role: str, page: int = 1, page_size: int = 10):
     """Obtener préstamos paginados según el rol del usuario."""
@@ -56,12 +54,11 @@ def loans(session: Session, user_id: int, user_role: str, page: int = 1, page_si
             detail="Un error inesperado ocurrió al obtener los préstamos."
         ) from exc
 
-
+from fastapi.responses import JSONResponse
+from fastapi import status
 
 def create_loan_with_relations(session: Session, loan_data: LoanCreate):
-    """Crear un préstamo y sus relaciones."""
     try:
-        # Crear el préstamo principal en la tabla Loan
         new_loan = Loan(
             loan_date=loan_data.loan_date,
             return_date=loan_data.return_date,
@@ -70,29 +67,36 @@ def create_loan_with_relations(session: Session, loan_data: LoanCreate):
         )
         session.add(new_loan)
         session.commit()
-        session.refresh(new_loan)
+        loan_id = new_loan.id
 
-        # Crear la relación en UserLoan
-        user_loan = UserLoan(user_id=loan_data.user_id, loan_id=new_loan.id)
-        session.add(user_loan)
-
-        # Crear la relación en LoanStock
         loan_stock = LoanStock(
-            stock_id=loan_data.stock_id, loan_id=new_loan.id, status="active"
+            stock_id=loan_data.stock_id, loan_id=loan_id, status="active"
         )
         session.add(loan_stock)
 
-        # Confirmar todos los cambios
-        session.commit()
+        for external_user in loan_data.external_users:
+            additional_user_loan = UserLoan(
+                user_id=loan_data.user_id,
+                loan_id=loan_id,
+                name=external_user.name,
+                student_code=external_user.student_code,
+            )
+            session.add(additional_user_loan)
 
-        return new_loan
+        session.commit()
+        return JSONResponse(
+            content={"status": "success", "message": "Préstamo creado exitosamente", "loan_id": loan_id},
+            status_code=status.HTTP_201_CREATED,
+        )
 
     except Exception as exc:
-        logger.error("Error al crear el préstamo con relaciones", exc_info=True)
         session.rollback()
+        logger.error("Error al crear el préstamo con usuarios adicionales", exc_info=True)
         raise HTTPException(
-            status_code=500, detail="Error al crear el préstamo con relaciones"
+            status_code=500, detail="Error al crear el préstamo con usuarios adicionales"
         ) from exc
+
+
 
 
 def update_loan_status(session: Session, loan_id: int, status: str):

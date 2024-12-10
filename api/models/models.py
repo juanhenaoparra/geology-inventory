@@ -35,11 +35,13 @@ class Loan(SQLModel, table=True):
     stocks: List["LoanStock"] = Relationship(back_populates="loan")
 
 
+
 class UserLoan(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-
     user_id: Optional[int] = Field(default=None, foreign_key="user.id")
     loan_id: Optional[int] = Field(default=None, foreign_key="loan.id")
+    name: Optional[str] = Field(default=None)
+    student_code: Optional[str] = Field(default=None)
 
     user: Optional[User] = Relationship(back_populates="loans")
     loan: Optional[Loan] = Relationship(back_populates="users")
