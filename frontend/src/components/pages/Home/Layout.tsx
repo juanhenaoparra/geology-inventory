@@ -1,46 +1,64 @@
 import React from 'react'
-import { Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 import StockItemForm from '@/components/pages/Stock/StockItemForm'
 import LoanPage from '@/components/pages/Loan/LoanPage'
 import StockList from '@/components/pages/Stock/StockList'
 import LoansList from '@/components/pages/Loan/LoansList'
 import EditStockItemFormWrapper from '@/components/pages/Stock/EditStockFormWrapper'
 import Home from '@/components/pages/Home/Home'
+import CreateLoanPage from '@/components/pages/Loan/CreateLoan'
 import { useUserStore } from '@/globalStates/useUserStore'
+import { Button } from '@/components/ui/button'
 
 const Layout: React.FC = () => {
-    const { user } = useUserStore()
+    const { user, clearUser } = useUserStore()
+    const navigate = useNavigate()
     const isAdmin = user.role === 'admin'
+
+    const handleLogout = () => {
+        clearUser()
+        navigate('/login')
+    }
 
     return (
         <div className="container mx-auto p-4">
-            <nav className="mb-4">
+            <nav className="mb-4 flex justify-between items-center">
                 <ul className="flex gap-4">
                     <li>
                         <Link to="/home" className="hover:underline">
-                            Home
+                            Inicio
                         </Link>
                     </li>
                     {isAdmin && (
                         <>
                             <li>
                                 <Link to="/stock" className="hover:underline">
-                                    Stock Form
+                                    Agregar herramienta
                                 </Link>
                             </li>
                             <li>
                                 <Link to="/stockList" className="hover:underline">
-                                    Stock List
+                                    Inventario de herramientas
                                 </Link>
                             </li>
                         </>
                     )}
                     <li>
-                        <Link to="/loan" className="hover:underline">
-                            Loan
+                        <Link to="/loans" className="hover:underline">
+                            Préstamos
                         </Link>
                     </li>
+                    {user.role === 'student' && (
+                        <li>
+                            <Link to="/create-loan" className="hover:underline">
+                                Crear préstamo
+                            </Link>
+                        </li>
+                    )}
                 </ul>
+                <Button onClick={handleLogout} variant="destructive">
+                    Cerrar Sesión
+                </Button>
             </nav>
 
             <Routes>
@@ -54,9 +72,12 @@ const Layout: React.FC = () => {
                 )}
                 <Route path="/loans" element={<LoansList />} />
                 <Route path="/loan" element={<LoanPage />} />
+                {user.role === 'student' && (
+                    <Route path="/create-loan" element={<CreateLoanPage />} />
+                )}
             </Routes>
         </div>
     )
 }
 
-export default Layout 
+export default Layout

@@ -21,7 +21,7 @@ export async function registerUser(userData: OAuthUser): Promise<User> {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json',
+                Accept: 'application/json',
             },
             credentials: 'include',
             body: JSON.stringify(userData),
@@ -34,6 +34,27 @@ export async function registerUser(userData: OAuthUser): Promise<User> {
         return response.json()
     } catch (error) {
         console.error('Error:', error)
+        throw error
+    }
+}
+
+export async function updateUser(userData: Partial<User>): Promise<User> {
+    try {
+        const response = await fetch(`${USERS_API_HOST}/${userData.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData),
+        })
+
+        if (!response.ok) {
+            throw new Error('Error al actualizar el usuario')
+        }
+
+        return response.json()
+    } catch (error) {
+        console.error('Error en updateUser:', error)
         throw error
     }
 }
