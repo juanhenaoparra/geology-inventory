@@ -1,16 +1,10 @@
 import React, { useEffect } from 'react'
-import { Button } from '@/components/ui/button'
 import { useUserStore } from '@/globalStates/useUserStore'
 import { useNavigate } from 'react-router-dom'
 
 const Home: React.FC = () => {
-    const { user, clearUser } = useUserStore()
+    const { user } = useUserStore()
     const navigate = useNavigate()
-
-    const handleLogout = () => {
-        clearUser()
-        navigate('/login')
-    }
 
     useEffect(() => {
         if (!user?.id) {
@@ -19,16 +13,15 @@ const Home: React.FC = () => {
     }, [user, navigate])
 
     return (
-        <main className='flex justify-between'>
-            <section>
-                <h1 className="text-2xl font-bold">Bienvenido al Sistema de Inventario</h1>
-                <p className="mt-2">Selecciona una opción del menú superior.</p>
-            </section>
-            <section>
-                <Button onClick={handleLogout}>Cerrar Sesión</Button>
-            </section>
+        <main className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-center">
+            <h1 className="text-3xl font-bold text-blue-600">
+                Bienvenido, {user?.name || 'Usuario'}
+            </h1>
+            <p className="mt-4 text-lg text-gray-700">
+                Este es el Sistema de Inventario. Usa las opciones del menú superior para navegar.
+            </p>
         </main>
     )
 }
 
-export default Home 
+export default Home

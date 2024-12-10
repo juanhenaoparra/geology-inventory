@@ -4,7 +4,6 @@ import LoginPage from '@/components/pages/Auth/LoginPage'
 import Layout from '@/components/pages/Home/Layout'
 import GoogleCallback from '@/components/pages/Auth/GoogleCallback'
 import RegisterPage from '@/components/pages/Auth/RegisterPage'
-import CreateLoan from '@/components/pages/Loan/CreateLoan'
 
 const App: React.FC = () => {
     return (
@@ -15,7 +14,6 @@ const App: React.FC = () => {
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/*" element={<Layout />} />
                 <Route path="/" element={<Navigate to="/login" replace />} />
-                <Route path="/create-loan" element={<CreateLoan />} />
             </Routes>
         </BrowserRouter>
     )

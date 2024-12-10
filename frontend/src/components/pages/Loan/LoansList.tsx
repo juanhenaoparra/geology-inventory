@@ -20,38 +20,34 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
         hasPrev: false,
     })
 
-    useEffect(() => {
-        const fetchLoans = async () => {
-            try {
-                const role = user.role ?? ''
-                const userId = user.id
+    const fetchLoans = async () => {
+        try {
+            const role = user.role ?? ''
+            const userId = user.id
 
-                if (!role || userId === undefined) {
-                    console.error('Invalid user role or user ID.')
-                    return
-                }
-
-                const data = await getLoans(
-                    userId,
-                    role,
-                    pagination.currentPage,
-                    pagination.pageSize,
-                )
-                setLoans(data.items)
-                setPagination((prev) => ({
-                    ...prev,
-                    totalItems: data.total,
-                    totalPages: data.pages,
-                    hasNext: data.has_next,
-                    hasPrev: data.has_prev,
-                }))
-            } catch (error) {
-                console.error('Error fetching loans:', error)
+            if (!role || userId === undefined) {
+                console.error('Invalid user role or user ID.')
+                return
             }
-        }
 
+            const data = await getLoans(userId, role, pagination.currentPage, pagination.pageSize)
+            setLoans(data.items) // Reemplaza los datos, no los acumula.
+            setPagination((prev) => ({
+                ...prev,
+                totalItems: data.total,
+                totalPages: data.pages,
+                hasNext: data.has_next,
+                hasPrev: data.has_prev,
+            }))
+        } catch (error) {
+            console.error('Error fetching loans:', error)
+        }
+    }
+
+    useEffect(() => {
         fetchLoans()
-    }, [pagination.currentPage, pagination.pageSize, user])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pagination.currentPage, pagination.pageSize]) // Actualiza solo cuando cambian estos valores.
 
     const handlePaginationChange = (newPage: number) => {
         setPagination((prev) => ({
@@ -64,17 +60,7 @@ const LoanList: React.FC<LoanListProps> = ({ onPaginationChange }) => {
     const handleStatusUpdate = async (loanId: number) => {
         try {
             await updateLoanStatus(loanId, LoanStatus.RETURNED)
-
-            const role = user.role ?? ''
-            const userId = user.id
-
-            if (!role || userId === undefined) {
-                console.error('Invalid user role or user ID.')
-                return
-            }
-
-            const data = await getLoans(userId, role, pagination.currentPage, pagination.pageSize)
-            setLoans(data.items)
+            fetchLoans() // Refresca la lista después de actualizar el estado.
         } catch (error) {
             console.error('Failed to update loan status:', error)
         }
