@@ -36,6 +36,7 @@ def sample_data(session):
         student_code="ST001",
         semester="3",
         career="Ingeniería",
+        role="student",
     )
     session.add(user)
     session.commit()
@@ -114,7 +115,7 @@ def test_create_loan_with_relations(session):
 
 def test_get_loans_user_info(session, sample_data):
     """Test para probar la información del usuario en los préstamos"""
-    result = loans(session=session)
+    result = loans(session=session, user_id=sample_data["user"].id, user_role="student")
 
     for loan in result.items:
         assert "user_name" in loan
@@ -123,7 +124,7 @@ def test_get_loans_user_info(session, sample_data):
 
 def test_get_loans_empty_database(session):
     """Test para probar que no haya préstamos en una base de datos vacía"""
-    result = loans(session=session)
+    result = loans(session=session, user_id=420, user_role="student")
     assert len(result.items) == 0
 
 

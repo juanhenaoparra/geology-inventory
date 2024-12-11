@@ -28,6 +28,9 @@ run-frontend:
 run-backend:
 	cd $(BACKEND_FOLDER) && $(VENV_NAME)/bin/python main.py
 
+test:
+	cd $(BACKEND_FOLDER) && $(VENV_NAME)/bin/pytest tests/
+
 # Clean up
 clean:
 	rm -rf $(BACKEND_FOLDER)/$(VENV_NAME)

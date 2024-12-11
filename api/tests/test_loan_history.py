@@ -10,6 +10,7 @@ from controllers.loan import loans
 # Configuración de la base de datos de prueba
 DATABASE_URL = "sqlite:///:memory:"
 
+
 @pytest.fixture
 def session():
     """Fixture para crear una sesión de base de datos en memoria"""
@@ -24,6 +25,7 @@ def session():
         yield db_session
     SQLModel.metadata.drop_all(engine)
 
+
 @pytest.fixture
 def sample_data(session):
     """Fixture para crear datos de prueba"""
@@ -34,7 +36,7 @@ def sample_data(session):
         email="juan@test.com",
         student_code="ST001",
         semester="3",
-        career="Ingeniería"
+        career="Ingeniería",
     )
     session.add(user)
     session.commit()
@@ -44,7 +46,7 @@ def sample_data(session):
         name="Martillo",
         description="Martillo de prueba",
         inventory_code="MT001",
-        quality="Buena"
+        quality="Buena",
     )
     session.add(stock)
     session.commit()
@@ -56,7 +58,7 @@ def sample_data(session):
             loan_date=datetime.now().strftime("%Y-%m-%d"),
             return_date=(datetime.now()).strftime("%Y-%m-%d"),
             status="activo",
-            observation=f"Préstamo de prueba {i+1}"
+            observation=f"Préstamo de prueba {i+1}",
         )
         session.add(loan)
         session.commit()
@@ -73,11 +75,18 @@ def sample_data(session):
 
     return {"user": user, "stock": stock, "loans": loans_data}
 
+
 def test_get_loans_pagination(session, sample_data):
     """Test para probar la paginación de préstamos"""
 
     # Probar primera página
-    result = loans(session=session, page=1, page_size=2)
+    result = loans(
+        session=session,
+        user_id=sample_data["user"].id,
+        user_role="student",
+        page=1,
+        page_size=2,
+    )
 
     assert len(result.items) == 2
     assert result.total == 3
@@ -87,7 +96,13 @@ def test_get_loans_pagination(session, sample_data):
     assert result.has_prev is False
 
     # Probar segunda página
-    result = loans(session=session, page=2, page_size=2)
+    result = loans(
+        session=session,
+        user_id=sample_data["user"].id,
+        user_role="student",
+        page=2,
+        page_size=2,
+    )
 
     assert len(result.items) == 1
     assert result.total == 3
@@ -95,29 +110,50 @@ def test_get_loans_pagination(session, sample_data):
     assert result.has_next is False
     assert result.has_prev is True
 
+
 def test_get_loans_user_info(session, sample_data):
     """Test para probar la información del usuario en los préstamos"""
 
-    result = loans(session=session, page=1, page_size=10)
+    result = loans(
+        session=session,
+        user_id=sample_data["user"].id,
+        user_role="student",
+        page=1,
+        page_size=10,
+    )
 
     for loan in result.items:
         assert "user_name" in loan
         assert loan["user_name"] == "Juan Pérez"
 
+
 def test_get_loans_empty_database(session):
     """Test para probar que no haya préstamos en una base de datos vacía"""
 
-    result = loans(session=session, page=1, page_size=10)
+    result = loans(
+        session=session,
+        user_id=sample_data["user"].id,
+        user_role="student",
+        page=1,
+        page_size=10,
+    )
 
     assert len(result.items) == 0
     assert result.total == 0
     assert result.has_next is False
     assert result.has_prev is False
 
+
 def test_get_loans_invalid_page(session, sample_data):
     """Test para probar que no haya préstamos en una página inválida"""
 
-    result = loans(session=session, page=999, page_size=10)
+    result = loans(
+        session=session,
+        user_id=sample_data["user"].id,
+        user_role="student",
+        page=999,
+        page_size=10,
+    )
 
     assert len(result.items) == 0
     assert result.total == 3
