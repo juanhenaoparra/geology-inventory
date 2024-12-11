@@ -57,7 +57,7 @@ def test_update_non_existing_stock(session):
 
 def test_update_stock_error_handling(session, monkeypatch):
     def mock_commit():
-        raise Exception("Database error")
+        raise ValueError("Database error")
 
     monkeypatch.setattr(Session, "commit", mock_commit)
 
