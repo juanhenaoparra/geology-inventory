@@ -49,3 +49,38 @@ def create_or_get_user(user_data: UserCreate, session: Session):
     except Exception as e:
         session.rollback()
         raise HTTPException(status_code=400, detail=str(e)) from e 
+
+def update_user_data(session: Session, user_id: int, user_data: dict):
+    """Actualiza los datos de un usuario verificando que el email no esté duplicado."""
+    if "email" in user_data:
+        # Verificar si el nuevo email ya existe para otro usuario
+        existing_user = session.exec(
+            select(User).where(
+                User.email == user_data["email"],
+                User.id != user_id
+            )
+        ).first()
+        
+        if existing_user:
+            raise HTTPException(
+                status_code=400,
+                detail="El email ya está registrado para otro usuario"
+            )
+    
+    # Buscar el usuario a actualizar
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    # Actualizar los campos proporcionados
+    for key, value in user_data.items():
+        setattr(user, key, value)
+    
+    try:
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        return user
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
