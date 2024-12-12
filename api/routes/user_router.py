@@ -28,22 +28,8 @@ def update_user(user_id: int, user_data: UserUpdate, session: Session = Depends(
     """
     Actualiza los datos de un usuario.
     """
-    # Buscar el usuario en la base de datos
-    statement = select(User).where(User.id == user_id)
-    user_instance = session.exec(statement).first()
-
-    if not user_instance:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-
-    # Actualizar los campos proporcionados
-    for key, value in user_data.model_dump(exclude_unset=True).items():
-        setattr(user_instance, key, value)
-
-    session.add(user_instance)
-    session.commit()
-    session.refresh(user_instance)
-
-    return user_instance
-
-
-
+    return user.update_user_data(
+        session=session,
+        user_id=user_id,
+        user_data=user_data.model_dump(exclude_unset=True)
+    )

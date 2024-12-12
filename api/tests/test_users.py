@@ -1,8 +1,8 @@
 """Testing for user"""
 
-from controllers.user import create_or_get_user, get_all_users, validate_email
+from controllers.user import create_or_get_user, get_all_users, validate_email, update_user_data
 from models.models import User
-from models.schemas import UserCreate
+from models.schemas import UserCreate, UserUpdate
 import pytest
 from fastapi import HTTPException
 
@@ -121,3 +121,23 @@ def test_create_user_empty_name(session):
 def test_validate_email_empty():
     """Probar la validación de email vacío."""
     assert validate_email("") is False
+
+def test_update_user_duplicate_email(session):
+    """Probar que no se puede actualizar un usuario con un email que ya existe."""
+    # Crear dos usuarios
+    user1 = User(name="Usuario 1", email="user1@test.com")
+    user2 = User(name="Usuario 2", email="user2@test.com")
+    session.add(user1)
+    session.add(user2)
+    session.commit()
+
+    # Intentar actualizar user2 con el email de user1
+    update_data = {
+        "email": "user1@test.com"
+    }
+
+    with pytest.raises(HTTPException) as exc_info:
+        update_user_data(session=session, user_id=user2.id, user_data=update_data)
+
+    assert exc_info.value.status_code == 400
+    assert "email ya está registrado" in str(exc_info.value.detail)
